@@ -71,8 +71,10 @@ def make_dashboard_html(df):
     weekday = today_korean_weekday()
     morning_set, afternoon_set, dinner_set, night_set = SET_RULES[weekday]
 
-    dalseo_df = df[df["이름"].isin(DALSEO_TEAM)].copy()
-    sonic_df = df[~df["이름"].isin(DALSEO_TEAM)].copy()
+    df["팀"] = df["이름"].apply(lambda x: "달서팀" if x in DALSEO_TEAM else "소닉팀")
+
+    dalseo_df = df[df["팀"] == "달서팀"].copy()
+    sonic_df = df[df["팀"] == "소닉팀"].copy()
 
     total_complete = int(df["총완료"].sum())
     total_reject = int(df["거절"].sum())
@@ -107,7 +109,7 @@ def make_dashboard_html(df):
         return f"""
         <div class="peak-card">
             <div class="peak-title">
-                <div class="mini-logo">S</div>
+                <div class="wing">S</div>
                 <span>{title} ({total_value}/{total_target})</span>
             </div>
 
@@ -136,6 +138,44 @@ def make_dashboard_html(df):
         peak_card("심야논피크", "심야논피크", night_set),
     ])
 
+    rider_cards = ""
+
+    for _, row in df.iterrows():
+        name = row["이름"]
+        team = row["팀"]
+        status = str(row["운행상태"])
+        is_online = "운행중" in status
+
+        card_class = "rider-card online" if is_online else "rider-card offline"
+        badge_class = "badge online-badge" if is_online else "badge offline-badge"
+        badge_text = "접속중" if is_online else "오프라인"
+        online_sort = 0 if is_online else 1
+
+        rider_cards += f"""
+        <div class="{card_class}"
+            data-team="{team}"
+            data-online="{online_sort}"
+            data-name="{name}"
+            data-complete="{int(row['총완료'])}">
+
+            <div class="rider-top">
+                <div class="rider-name">{name}</div>
+                <div class="{badge_class}">{badge_text}</div>
+            </div>
+
+            <div class="rider-sub">{team} | {badge_text}</div>
+
+            <div class="rider-stats">
+                <div><span>완료</span><b class="blue">{int(row['총완료'])}</b></div>
+                <div><span>거절</span><b class="red">{int(row['거절'])}</b></div>
+                <div><span>오전</span><b>{int(row['오전피크'])}</b></div>
+                <div><span>오후</span><b>{int(row['오후논피크'])}</b></div>
+                <div><span>저녁</span><b>{int(row['저녁피크'])}</b></div>
+                <div><span>심야</span><b>{int(row['심야논피크'])}</b></div>
+            </div>
+        </div>
+        """
+
     html = f"""
 <!DOCTYPE html>
 <html lang="ko">
@@ -144,82 +184,590 @@ def make_dashboard_html(df):
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="refresh" content="60">
 <title>슈퍼소닉 달서A</title>
+
 <style>
-* {{ box-sizing: border-box; }}
+* {{ box-sizing:border-box; }}
+
 body {{
     margin:0;
-    padding:24px 14px 40px;
     background:#ffffff;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;
     color:#111;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;
 }}
-.wrap {{ max-width:980px; margin:0 auto; }}
-.logo {{
-    width:70px; height:70px; margin:0 auto 12px; border-radius:50%;
-    background:#ff1630; color:white; display:flex; align-items:center; justify-content:center;
-    font-size:42px; font-weight:900;
+
+.topbar {{
+    position:sticky;
+    top:0;
+    z-index:10;
+    background:#fff;
+    border-bottom:1px solid #eee;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:14px 34px;
 }}
-.title {{ text-align:center; font-size:42px; font-weight:900; margin:0; }}
-.updated {{ margin-top:10px; text-align:center; color:#666; font-size:16px; font-weight:700; margin-bottom:26px; }}
+
+.top-left {{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    font-size:26px;
+    font-weight:900;
+}}
+
+.mark {{
+    width:48px;
+    height:48px;
+    border-radius:50%;
+    background:#ff1630;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:900;
+    font-size:27px;
+    position:relative;
+}}
+
+.mark:before,
+.mark:after {{
+    content:"";
+    position:absolute;
+    width:24px;
+    height:10px;
+    border-top:5px solid #ff1630;
+    top:16px;
+}}
+
+.mark:before {{
+    left:-23px;
+    transform:rotate(24deg);
+}}
+
+.mark:after {{
+    right:-23px;
+    transform:rotate(-24deg);
+}}
+
+.refresh {{
+    color:#555;
+    font-size:14px;
+    line-height:1.35;
+    font-weight:700;
+    text-align:right;
+}}
+
+.wrap {{
+    max-width:1180px;
+    margin:0 auto;
+    padding:34px 18px 50px;
+}}
+
+.hero-logo {{
+    width:72px;
+    height:72px;
+    margin:0 auto 12px;
+    border-radius:50%;
+    background:#ff1630;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:42px;
+    font-weight:900;
+    position:relative;
+}}
+
+.hero-logo:before,
+.hero-logo:after {{
+    content:"";
+    position:absolute;
+    width:38px;
+    height:15px;
+    border-top:7px solid #ff1630;
+    top:23px;
+}}
+
+.hero-logo:before {{
+    left:-36px;
+    transform:rotate(24deg);
+}}
+
+.hero-logo:after {{
+    right:-36px;
+    transform:rotate(-24deg);
+}}
+
+.title {{
+    text-align:center;
+    font-size:42px;
+    font-weight:900;
+    margin:0 0 8px;
+}}
+
+.updated {{
+    text-align:center;
+    color:#666;
+    font-size:14px;
+    margin-bottom:24px;
+}}
+
 .summary {{
-    display:grid; grid-template-columns:repeat(2,1fr);
-    border:3px solid #ff1630; border-radius:18px; overflow:hidden; margin-bottom:28px;
+    max-width:720px;
+    margin:0 auto 32px;
+    border:3px solid #ff1630;
+    border-radius:14px;
+    overflow:hidden;
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
 }}
+
 .summary-item {{
-    min-height:108px; display:flex; flex-direction:column; align-items:center; justify-content:center;
-    border-right:2px solid #ff1630; border-bottom:2px solid #ff1630;
+    min-height:74px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 26px;
+    border-right:2px solid #ff1630;
+    border-bottom:1.5px solid #ff1630;
+    font-size:19px;
+    font-weight:800;
 }}
+
 .summary-item:nth-child(2n) {{ border-right:none; }}
 .summary-item:nth-last-child(-n+2) {{ border-bottom:none; }}
-.summary-label {{ font-size:20px; font-weight:900; margin-bottom:8px; }}
-.summary-value {{ font-size:32px; font-weight:900; }}
+
+.summary-value {{
+    font-size:23px;
+    font-weight:900;
+}}
+
 .red {{ color:#e60012; }}
-.blue {{ color:#2563eb; }}
-.green {{ color:#079b24; }}
-.yellow {{ color:#d97706; }}
-.peaks {{ display:grid; grid-template-columns:1fr; gap:18px; }}
-.peak-card {{ border:3px solid #ff1630; border-radius:22px; padding:22px; }}
-.peak-title {{ display:flex; align-items:center; gap:12px; font-size:24px; font-weight:900; margin-bottom:22px; }}
-.mini-logo {{
-    width:38px; height:38px; border-radius:50%; background:#ff1630; color:white;
-    display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:900;
+.blue {{ color:#1455ff; }}
+.green {{ color:#05a832; }}
+.yellow {{ color:#d58900; }}
+
+.peaks {{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:20px 28px;
+    margin-bottom:24px;
 }}
-.bar-row {{ display:grid; grid-template-columns:70px 1fr; gap:12px; align-items:center; margin-bottom:16px; }}
-.bar-label {{ font-size:22px; font-weight:900; }}
-.bar-wrap {{ position:relative; height:28px; background:#ffd1d8; border-radius:999px; overflow:hidden; }}
-.bar-fill {{ height:100%; background:linear-gradient(90deg,#ff3b50,#ff1630); }}
+
+.peak-card {{
+    border:3px solid #ff1630;
+    border-radius:24px;
+    padding:22px 34px 28px;
+}}
+
+.peak-title {{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    font-size:28px;
+    font-weight:900;
+    margin-bottom:30px;
+}}
+
+.wing {{
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    background:#ff1630;
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:900;
+    font-size:20px;
+}}
+
+.bar-row {{
+    display:grid;
+    grid-template-columns:88px 1fr;
+    align-items:center;
+    gap:16px;
+    margin-bottom:16px;
+}}
+
+.bar-label {{
+    font-size:28px;
+    font-weight:900;
+}}
+
+.bar-wrap {{
+    position:relative;
+    height:30px;
+    background:#ffd1d8;
+    border-radius:999px;
+    overflow:hidden;
+}}
+
+.bar-fill {{
+    height:100%;
+    background:linear-gradient(90deg,#ff3b50,#ff1630);
+    border-radius:999px;
+}}
+
 .bar-text {{
-    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-    font-size:18px; font-weight:900;
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:20px;
+    font-weight:900;
 }}
-.footer {{ margin-top:24px; text-align:center; color:#666; font-size:18px; font-weight:700; }}
+
+.filter-area {{
+    border-top:1px solid #ddd;
+    padding-top:20px;
+    margin-top:16px;
+}}
+
+.control-row {{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    margin-bottom:18px;
+    flex-wrap:wrap;
+}}
+
+.tabs {{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+}}
+
+.tab {{
+    border:none;
+    border-radius:12px;
+    padding:14px 24px;
+    font-size:20px;
+    font-weight:900;
+    background:#eee;
+    cursor:pointer;
+}}
+
+.tab.active {{
+    background:#08b23b;
+    color:white;
+}}
+
+.sort-box {{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-weight:900;
+    font-size:18px;
+}}
+
+.sort-select {{
+    padding:13px 16px;
+    border:2px solid #111;
+    border-radius:12px;
+    font-size:18px;
+    font-weight:900;
+    background:#fff;
+}}
+
+.riders {{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:18px;
+}}
+
+.rider-card {{
+    border:2.5px solid #555;
+    border-radius:16px;
+    padding:18px;
+    background:white;
+}}
+
+.rider-card.online {{
+    border-color:#08c747;
+}}
+
+.rider-card.offline {{
+    border-color:#444;
+    opacity:0.82;
+}}
+
+.rider-top {{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:8px;
+}}
+
+.rider-name {{
+    font-size:24px;
+    font-weight:900;
+}}
+
+.badge {{
+    border-radius:999px;
+    padding:6px 12px;
+    color:white;
+    font-size:15px;
+    font-weight:900;
+    white-space:nowrap;
+}}
+
+.online-badge {{ background:#08b23b; }}
+.offline-badge {{ background:#555; }}
+
+.rider-sub {{
+    margin-top:8px;
+    color:#666;
+    font-size:15px;
+    font-weight:700;
+}}
+
+.rider-stats {{
+    margin-top:16px;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px 6px;
+}}
+
+.rider-stats div {{
+    display:flex;
+    gap:6px;
+    align-items:center;
+    font-size:14px;
+    font-weight:800;
+}}
+
+.rider-stats b {{
+    font-size:18px;
+}}
+
+.footer {{
+    margin-top:28px;
+    text-align:center;
+    color:#666;
+    font-size:16px;
+    font-weight:700;
+}}
+
+@media (max-width:900px) {{
+    .topbar {{
+        padding:12px 16px;
+        flex-direction:column;
+        gap:10px;
+    }}
+
+    .top-left {{
+        font-size:22px;
+    }}
+
+    .refresh {{
+        text-align:center;
+    }}
+
+    .title {{
+        font-size:34px;
+    }}
+
+    .summary-item {{
+        min-height:74px;
+        padding:0 16px;
+        font-size:16px;
+    }}
+
+    .summary-value {{
+        font-size:21px;
+    }}
+
+    .peaks {{
+        grid-template-columns:1fr;
+    }}
+
+    .peak-card {{
+        padding:20px 18px;
+    }}
+
+    .peak-title {{
+        font-size:24px;
+    }}
+
+    .bar-row {{
+        grid-template-columns:64px 1fr;
+    }}
+
+    .bar-label {{
+        font-size:23px;
+    }}
+
+    .control-row {{
+        display:block;
+    }}
+
+    .tabs {{
+        margin-bottom:14px;
+    }}
+
+    .sort-box {{
+        justify-content:space-between;
+    }}
+
+    .sort-select {{
+        width:180px;
+    }}
+
+    .riders {{
+        grid-template-columns:repeat(2,1fr);
+        gap:12px;
+    }}
+
+    .rider-name {{
+        font-size:20px;
+    }}
+
+    .tab {{
+        font-size:17px;
+        padding:12px 16px;
+    }}
+}}
+
+@media (max-width:520px) {{
+    .riders {{
+        grid-template-columns:1fr;
+    }}
+}}
 </style>
 </head>
+
 <body>
+
+<div class="topbar">
+    <div class="top-left">
+        <div class="mark">S</div>
+        <div>슈퍼소닉 달서A 대시보드</div>
+    </div>
+
+    <div class="refresh">
+        🔄 1분마다 자동 업데이트
+    </div>
+</div>
+
 <div class="wrap">
-    <div class="logo">S</div>
+
+    <div class="hero-logo">S</div>
     <h1 class="title">슈퍼소닉 달서A</h1>
     <div class="updated">🕘 {updated}</div>
 
     <div class="summary">
-        <div class="summary-item"><div class="summary-label">총완료</div><div class="summary-value red">{total_complete:,}</div></div>
-        <div class="summary-item"><div class="summary-label">총거절</div><div class="summary-value red">{total_reject:,}</div></div>
-        <div class="summary-item"><div class="summary-label">배차취소</div><div class="summary-value red">{total_dispatch_cancel:,}</div></div>
-        <div class="summary-item"><div class="summary-label">배달취소</div><div class="summary-value red">{total_delivery_cancel:,}</div></div>
-        <div class="summary-item"><div class="summary-label">주간수락률</div><div class="summary-value yellow">{weekly_accept_rate}%</div></div>
-        <div class="summary-item"><div class="summary-label">당일수락률</div><div class="summary-value blue">{daily_accept_rate}%</div></div>
-        <div class="summary-item"><div class="summary-label">거절가능</div><div class="summary-value yellow">{available_rejects}개</div></div>
-        <div class="summary-item"><div class="summary-label">전체접속</div><div class="summary-value green">{total_running}명</div></div>
-        <div class="summary-item"><div class="summary-label">소닉팀</div><div class="summary-value green">{sonic_running}명</div></div>
-        <div class="summary-item"><div class="summary-label">달서팀</div><div class="summary-value green">{dalseo_running}명</div></div>
+        <div class="summary-item"><span>총완료</span><b class="summary-value red">{total_complete:,}</b></div>
+        <div class="summary-item"><span>총거절</span><b class="summary-value red">{total_reject:,}</b></div>
+        <div class="summary-item"><span>배차취소</span><b class="summary-value red">{total_dispatch_cancel:,}</b></div>
+        <div class="summary-item"><span>배달취소</span><b class="summary-value red">{total_delivery_cancel:,}</b></div>
+        <div class="summary-item"><span>주간수락률</span><b class="summary-value yellow">{weekly_accept_rate}%</b></div>
+        <div class="summary-item"><span>당일수락률</span><b class="summary-value blue">{daily_accept_rate}%</b></div>
+        <div class="summary-item"><span>거절가능</span><b class="summary-value yellow">{available_rejects}개</b></div>
+        <div class="summary-item"><span>전체접속</span><b class="summary-value green">{total_running}명</b></div>
+        <div class="summary-item"><span>소닉팀</span><b class="summary-value green">{sonic_running}명</b></div>
+        <div class="summary-item"><span>달서팀</span><b class="summary-value green">{dalseo_running}명</b></div>
     </div>
 
     <div class="peaks">
         {peak_cards}
     </div>
 
-    <div class="footer">↻ 1분마다 자동 갱신 중...</div>
+    <div class="filter-area">
+        <div class="control-row">
+            <div class="tabs">
+                <button class="tab active" onclick="setFilter('전체', this)">전체 ({len(df)})</button>
+                <button class="tab" onclick="setFilter('소닉팀', this)">소닉팀 ({len(sonic_df)})</button>
+                <button class="tab" onclick="setFilter('달서팀', this)">달서팀 ({len(dalseo_df)})</button>
+            </div>
+
+            <div class="sort-box">
+                <span>정렬</span>
+                <select id="sortSelect" class="sort-select" onchange="applySort()">
+                    <option value="online">접속중 우선</option>
+                    <option value="name">가나다순</option>
+                    <option value="complete">완료순</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="riders" class="riders">
+            {rider_cards}
+        </div>
+    </div>
+
+    <div class="footer">실시간 데이터 · 1분마다 자동 업데이트</div>
+
 </div>
+
+<script>
+let currentFilter = "전체";
+
+function setFilter(value, btn) {{
+    currentFilter = value;
+
+    document.querySelectorAll(".tab").forEach(item => item.classList.remove("active"));
+    btn.classList.add("active");
+
+    applyView();
+}}
+
+function applySort() {{
+    applyView();
+}}
+
+function applyView() {{
+    const sortValue = document.getElementById("sortSelect").value;
+    const container = document.getElementById("riders");
+    const cards = Array.from(document.querySelectorAll(".rider-card"));
+
+    cards.forEach(card => {{
+        const team = card.dataset.team;
+        let show = true;
+
+        if(currentFilter === "소닉팀") show = team === "소닉팀";
+        if(currentFilter === "달서팀") show = team === "달서팀";
+
+        card.style.display = show ? "block" : "none";
+    }});
+
+    const visibleCards = cards.filter(card => card.style.display !== "none");
+
+    visibleCards.sort((a, b) => {{
+        if(sortValue === "online") {{
+            const onlineA = Number(a.dataset.online);
+            const onlineB = Number(b.dataset.online);
+
+            if(onlineA !== onlineB) return onlineA - onlineB;
+
+            const completeA = Number(a.dataset.complete);
+            const completeB = Number(b.dataset.complete);
+
+            return completeB - completeA;
+        }}
+
+        if(sortValue === "name") {{
+            return a.dataset.name.localeCompare(b.dataset.name, "ko");
+        }}
+
+        if(sortValue === "complete") {{
+            return Number(b.dataset.complete) - Number(a.dataset.complete);
+        }}
+
+        return 0;
+    }});
+
+    visibleCards.forEach(card => container.appendChild(card));
+}}
+
+document.addEventListener("DOMContentLoaded", function() {{
+    applyView();
+}});
+</script>
+
 </body>
 </html>
 """
