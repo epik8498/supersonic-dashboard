@@ -46,12 +46,28 @@ body {
     height:auto;
 }
 
+.top-actions {
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
 .refresh {
     color:#555;
     font-size:14px;
     line-height:1.35;
     font-weight:700;
     text-align:right;
+}
+
+.region-nav select {
+    padding:10px 14px;
+    border-radius:10px;
+    border:2px solid #111;
+    font-size:15px;
+    font-weight:900;
+    background:white;
+    cursor:pointer;
 }
 
 .wrap {
@@ -163,10 +179,11 @@ body {
     color:white;
     background:#e60012;
     border-radius:999px;
-    padding:6px 12px;
-    font-size:15px;
-
+    padding:7px 14px;
+    font-size:14px;
     white-space:nowrap;
+    min-width:72px;
+    text-align:center;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -212,6 +229,7 @@ body {
     justify-content:center;
     font-size:20px;
     font-weight:900;
+    white-space:nowrap;
 }
 
 .filter-area {
@@ -304,6 +322,24 @@ body {
 .rider-name {
     font-size:24px;
     font-weight:900;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    white-space:nowrap;
+}
+
+.mini-warning {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:22px;
+    height:22px;
+    border-radius:50%;
+    background:#e60012;
+    color:white;
+    font-size:13px;
+    font-weight:900;
+    flex:0 0 auto;
 }
 
 .badge {
@@ -325,17 +361,6 @@ body {
     font-weight:700;
 }
 
-.warn-box {
-    margin-top:10px;
-    background:#fff0f0;
-    color:#e60012;
-    border:1px solid #e60012;
-    border-radius:10px;
-    padding:8px;
-    font-weight:900;
-    text-align:center;
-}
-
 .rider-stats {
     margin-top:16px;
     display:grid;
@@ -347,9 +372,9 @@ body {
     display:flex;
     gap:6px;
     align-items:center;
+    justify-content:center;
     font-size:14px;
     font-weight:800;
-
     white-space:nowrap;
 }
 
@@ -364,9 +389,19 @@ body {
 }
 
 @media (max-width:900px) {
-    .topbar { padding:12px 16px; flex-direction:column; gap:10px; }
+    .topbar {
+        padding:12px 16px;
+        flex-direction:column;
+        gap:10px;
+    }
+
     .top-left { font-size:22px; }
+    .top-actions {
+        flex-direction:column;
+        gap:8px;
+    }
     .refresh { text-align:center; }
+    .region-nav select { width:180px; }
     .title { font-size:34px; }
     .main-logo { width:180px; }
     .summary-item { min-height:74px; padding:0 16px; font-size:16px; }
@@ -395,30 +430,50 @@ body {
 <body>
 
 <div class="topbar">
+
     <div class="top-left">
         <img src="logo.png" class="top-logo">
         <div>슈퍼소닉 중구A 대시보드</div>
     </div>
-    <div class="refresh">🔄 1분마다 자동 업데이트</div>
+
+    <div class="top-actions">
+
+        <div class="refresh">
+            🔄 1분마다 자동 업데이트
+        </div>
+
+        <div class="region-nav">
+            <select onchange="moveRegion(this.value)">
+                <option value="">권역 이동</option>
+                <option value="index.html">메인</option>
+                <option value="중구A_dashboard.html">중구A</option>
+                <option value="달서A_dashboard.html">달서A</option>
+                <option value="달서B_dashboard.html">달서B</option>
+                <option value="maeum-dashboard.html">마음팀</option>
+            </select>
+        </div>
+
+    </div>
+
 </div>
 
 <div class="wrap">
 
     <img src="logo.png" class="main-logo">
     <h1 class="title">슈퍼소닉 중구A</h1>
-    <div class="updated">🕘 2026.05.21 01:50 기준</div>
+    <div class="updated">🕘 2026.05.21 02:26 기준</div>
     <div class="now-peak">🔥 현재 진행중: 심야논피크</div>
 
     <div class="summary">
-        <div class="summary-item"><span>총완료</span><b class="summary-value red">682</b></div>
+        <div class="summary-item"><span>총완료</span><b class="summary-value red">687</b></div>
         <div class="summary-item"><span>총거절</span><b class="summary-value red">105</b></div>
         <div class="summary-item"><span>배차취소</span><b class="summary-value red">32</b></div>
         <div class="summary-item"><span>배달취소</span><b class="summary-value red">0</b></div>
-        <div class="summary-item"><span>주간수락률</span><b class="summary-value yellow">83.3%</b></div>
-        <div class="summary-item"><span>당일수락률</span><b class="summary-value blue">83.3%</b></div>
-        <div class="summary-item"><span>거절가능</span><b class="summary-value yellow">33개</b></div>
-        <div class="summary-item"><span>전체접속</span><b class="summary-value green">3명</b></div>
-        <div class="summary-item"><span>소닉팀</span><b class="summary-value green">3명</b></div>
+        <div class="summary-item"><span>주간수락률</span><b class="summary-value yellow">83.4%</b></div>
+        <div class="summary-item"><span>당일수락률</span><b class="summary-value blue">83.4%</b></div>
+        <div class="summary-item"><span>거절가능</span><b class="summary-value yellow">34개</b></div>
+        <div class="summary-item"><span>전체접속</span><b class="summary-value green">1명</b></div>
+        <div class="summary-item"><span>소닉팀</span><b class="summary-value green">1명</b></div>
         <div class="summary-item"><span>넘버팀</span><b class="summary-value green">0명</b></div>
     </div>
 
@@ -498,7 +553,7 @@ body {
         <div class="peak-card active-peak">
             <div class="peak-title">
                 <img src="logo.png" class="small-logo">
-                <span>심야논피크 (201/145)</span>
+                <span>심야논피크 (206/145)</span>
                 <em>진행중</em>
             </div>
 
@@ -506,7 +561,7 @@ body {
                 <div class="bar-label">소닉</div>
                 <div class="bar-wrap">
                     <div class="bar-fill" style="width:100%"></div>
-                    <div class="bar-text" style="color:#08b23b">158/116</div>
+                    <div class="bar-text" style="color:#08b23b">163/116</div>
                 </div>
             </div>
 
@@ -544,81 +599,28 @@ body {
         <div class="rider-card online"
             data-team="소닉팀"
             data-online="0"
-            data-name="김용상"
-            data-complete="39"
-            data-rate="83.0">
-
-            <div class="rider-top">
-                <div class="rider-name">김용상</div>
-                <div class="badge online-badge">접속중</div>
-            </div>
-
-            <div class="rider-sub">소닉팀 | 접속중</div>
-
-            
-
-            <div class="rider-stats">
-                <div><span>완료</span><b class="blue">39</b></div>
-                <div><span>거절</span><b class="red">7</b></div>
-                <div><span>수락</span><b class="yellow">83.0%</b></div>
-                <div><span>오전</span><b>0</b></div>
-                <div><span>오후</span><b>0</b></div>
-                <div><span>저녁</span><b>13</b></div>
-                <div><span>심야</span><b>26</b></div>
-            </div>
-        </div>
-        
-        <div class="rider-card online"
-            data-team="소닉팀"
-            data-online="0"
-            data-name="성기창"
-            data-complete="23"
-            data-rate="100.0">
-
-            <div class="rider-top">
-                <div class="rider-name">성기창</div>
-                <div class="badge online-badge">접속중</div>
-            </div>
-
-            <div class="rider-sub">소닉팀 | 접속중</div>
-
-            
-
-            <div class="rider-stats">
-                <div><span>완료</span><b class="blue">23</b></div>
-                <div><span>거절</span><b class="red">0</b></div>
-                <div><span>수락</span><b class="yellow">100.0%</b></div>
-                <div><span>오전</span><b>0</b></div>
-                <div><span>오후</span><b>0</b></div>
-                <div><span>저녁</span><b>0</b></div>
-                <div><span>심야</span><b>23</b></div>
-            </div>
-        </div>
-        
-        <div class="rider-card online"
-            data-team="소닉팀"
-            data-online="0"
             data-name="황주호"
-            data-complete="8"
-            data-rate="80.0">
+            data-complete="11"
+            data-rate="84.6">
 
             <div class="rider-top">
-                <div class="rider-name">황주호</div>
+                <div class="rider-name">
+                    황주호
+                    
+                </div>
                 <div class="badge online-badge">접속중</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 접속중</div>
 
-            
-
             <div class="rider-stats">
-                <div><span>완료</span><b class="blue">8</b></div>
+                <div><span>완료</span><b class="blue">11</b></div>
                 <div><span>거절</span><b class="red">2</b></div>
-                <div><span>수락</span><b class="yellow">80.0%</b></div>
+                <div><span>수락</span><b class="yellow">84.6%</b></div>
                 <div><span>오전</span><b>0</b></div>
                 <div><span>오후</span><b>0</b></div>
                 <div><span>저녁</span><b>0</b></div>
-                <div><span>심야</span><b>8</b></div>
+                <div><span>심야</span><b>11</b></div>
             </div>
         </div>
         
@@ -630,13 +632,14 @@ body {
             data-rate="84.5">
 
             <div class="rider-top">
-                <div class="rider-name">한창목</div>
+                <div class="rider-name">
+                    한창목
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">넘버팀 | 오프라인</div>
-
-            
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">49</b></div>
@@ -657,13 +660,14 @@ body {
             data-rate="92.3">
 
             <div class="rider-top">
-                <div class="rider-name">이경림</div>
+                <div class="rider-name">
+                    이경림
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">넘버팀 | 오프라인</div>
-
-            
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">36</b></div>
@@ -684,13 +688,14 @@ body {
             data-rate="100.0">
 
             <div class="rider-top">
-                <div class="rider-name">석윤미</div>
+                <div class="rider-name">
+                    석윤미
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">넘버팀 | 오프라인</div>
-
-            
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">30</b></div>
@@ -711,13 +716,14 @@ body {
             data-rate="100.0">
 
             <div class="rider-top">
-                <div class="rider-name">구민성</div>
+                <div class="rider-name">
+                    구민성
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">넘버팀 | 오프라인</div>
-
-            
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">29</b></div>
@@ -738,13 +744,14 @@ body {
             data-rate="100.0">
 
             <div class="rider-top">
-                <div class="rider-name">최중용</div>
+                <div class="rider-name">
+                    최중용
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">넘버팀 | 오프라인</div>
-
-            
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">10</b></div>
@@ -757,7 +764,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="넘버팀"
             data-online="1"
             data-name="김광미"
@@ -765,13 +772,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">김광미</div>
+                <div class="rider-name">
+                    김광미
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">넘버팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -784,7 +792,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="넘버팀"
             data-online="1"
             data-name="김병찬"
@@ -792,13 +800,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">김병찬</div>
+                <div class="rider-name">
+                    김병찬
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">넘버팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -811,7 +820,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="넘버팀"
             data-online="1"
             data-name="김성주"
@@ -819,13 +828,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">김성주</div>
+                <div class="rider-name">
+                    김성주
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">넘버팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -838,7 +848,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="넘버팀"
             data-online="1"
             data-name="김시곤"
@@ -846,13 +856,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">김시곤</div>
+                <div class="rider-name">
+                    김시곤
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">넘버팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -865,7 +876,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="넘버팀"
             data-online="1"
             data-name="김우중"
@@ -873,13 +884,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">김우중</div>
+                <div class="rider-name">
+                    김우중
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">넘버팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -892,7 +904,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="넘버팀"
             data-online="1"
             data-name="류창우"
@@ -900,13 +912,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">류창우</div>
+                <div class="rider-name">
+                    류창우
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">넘버팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -919,7 +932,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="넘버팀"
             data-online="1"
             data-name="박진수"
@@ -927,13 +940,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">박진수</div>
+                <div class="rider-name">
+                    박진수
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">넘버팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -946,7 +960,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="넘버팀"
             data-online="1"
             data-name="손성기"
@@ -954,13 +968,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">손성기</div>
+                <div class="rider-name">
+                    손성기
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">넘버팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -973,7 +988,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="넘버팀"
             data-online="1"
             data-name="염용범"
@@ -981,13 +996,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">염용범</div>
+                <div class="rider-name">
+                    염용범
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">넘버팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -1000,7 +1016,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="넘버팀"
             data-online="1"
             data-name="윤성훈"
@@ -1008,13 +1024,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">윤성훈</div>
+                <div class="rider-name">
+                    윤성훈
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">넘버팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -1027,7 +1044,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="넘버팀"
             data-online="1"
             data-name="이경은"
@@ -1035,13 +1052,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">이경은</div>
+                <div class="rider-name">
+                    이경은
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">넘버팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -1054,7 +1072,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="넘버팀"
             data-online="1"
             data-name="이금형"
@@ -1062,13 +1080,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">이금형</div>
+                <div class="rider-name">
+                    이금형
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">넘버팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -1081,7 +1100,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="넘버팀"
             data-online="1"
             data-name="이정미"
@@ -1089,13 +1108,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">이정미</div>
+                <div class="rider-name">
+                    이정미
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">넘버팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -1108,7 +1128,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="넘버팀"
             data-online="1"
             data-name="이창원"
@@ -1116,13 +1136,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">이창원</div>
+                <div class="rider-name">
+                    이창원
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">넘버팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -1135,7 +1156,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="넘버팀"
             data-online="1"
             data-name="정용운"
@@ -1143,13 +1164,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">정용운</div>
+                <div class="rider-name">
+                    정용운
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">넘버팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -1162,7 +1184,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="넘버팀"
             data-online="1"
             data-name="조영웅"
@@ -1170,13 +1192,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">조영웅</div>
+                <div class="rider-name">
+                    조영웅
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">넘버팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -1189,7 +1212,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="넘버팀"
             data-online="1"
             data-name="조정래"
@@ -1197,13 +1220,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">조정래</div>
+                <div class="rider-name">
+                    조정래
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">넘버팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -1216,7 +1240,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="넘버팀"
             data-online="1"
             data-name="지덕근"
@@ -1224,13 +1248,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">지덕근</div>
+                <div class="rider-name">
+                    지덕근
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">넘버팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -1243,7 +1268,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="넘버팀"
             data-online="1"
             data-name="채기훈"
@@ -1251,13 +1276,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">채기훈</div>
+                <div class="rider-name">
+                    채기훈
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">넘버팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -1270,7 +1296,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="넘버팀"
             data-online="1"
             data-name="천재원"
@@ -1278,13 +1304,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">천재원</div>
+                <div class="rider-name">
+                    천재원
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">넘버팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -1297,7 +1324,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="넘버팀"
             data-online="1"
             data-name="최문호"
@@ -1305,13 +1332,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">최문호</div>
+                <div class="rider-name">
+                    최문호
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">넘버팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -1332,13 +1360,14 @@ body {
             data-rate="61.5">
 
             <div class="rider-top">
-                <div class="rider-name">이국부</div>
+                <div class="rider-name">
+                    이국부
+                    <span class='mini-warning'>⚠</span>
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">56</b></div>
@@ -1359,13 +1388,14 @@ body {
             data-rate="100.0">
 
             <div class="rider-top">
-                <div class="rider-name">최순</div>
+                <div class="rider-name">
+                    최순
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">51</b></div>
@@ -1386,13 +1416,14 @@ body {
             data-rate="94.2">
 
             <div class="rider-top">
-                <div class="rider-name">박시우</div>
+                <div class="rider-name">
+                    박시우
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">49</b></div>
@@ -1413,13 +1444,14 @@ body {
             data-rate="81.0">
 
             <div class="rider-top">
-                <div class="rider-name">김지원</div>
+                <div class="rider-name">
+                    김지원
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">47</b></div>
@@ -1440,13 +1472,14 @@ body {
             data-rate="95.7">
 
             <div class="rider-top">
-                <div class="rider-name">박경보</div>
+                <div class="rider-name">
+                    박경보
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">45</b></div>
@@ -1467,13 +1500,14 @@ body {
             data-rate="62.0">
 
             <div class="rider-top">
-                <div class="rider-name">윤영훈</div>
+                <div class="rider-name">
+                    윤영훈
+                    <span class='mini-warning'>⚠</span>
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">44</b></div>
@@ -1489,18 +1523,47 @@ body {
         <div class="rider-card offline"
             data-team="소닉팀"
             data-online="1"
-            data-name="권예준"
-            data-complete="34"
-            data-rate="85.0">
+            data-name="김용상"
+            data-complete="39"
+            data-rate="83.0">
 
             <div class="rider-top">
-                <div class="rider-name">권예준</div>
+                <div class="rider-name">
+                    김용상
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
 
-            
+            <div class="rider-stats">
+                <div><span>완료</span><b class="blue">39</b></div>
+                <div><span>거절</span><b class="red">7</b></div>
+                <div><span>수락</span><b class="yellow">83.0%</b></div>
+                <div><span>오전</span><b>0</b></div>
+                <div><span>오후</span><b>0</b></div>
+                <div><span>저녁</span><b>13</b></div>
+                <div><span>심야</span><b>26</b></div>
+            </div>
+        </div>
+        
+        <div class="rider-card offline"
+            data-team="소닉팀"
+            data-online="1"
+            data-name="권예준"
+            data-complete="34"
+            data-rate="85.0">
+
+            <div class="rider-top">
+                <div class="rider-name">
+                    권예준
+                    
+                </div>
+                <div class="badge offline-badge">오프라인</div>
+            </div>
+
+            <div class="rider-sub">소닉팀 | 오프라인</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">34</b></div>
@@ -1521,13 +1584,14 @@ body {
             data-rate="69.6">
 
             <div class="rider-top">
-                <div class="rider-name">천용진</div>
+                <div class="rider-name">
+                    천용진
+                    <span class='mini-warning'>⚠</span>
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">32</b></div>
@@ -1548,13 +1612,14 @@ body {
             data-rate="96.8">
 
             <div class="rider-top">
-                <div class="rider-name">박경진</div>
+                <div class="rider-name">
+                    박경진
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">30</b></div>
@@ -1575,13 +1640,14 @@ body {
             data-rate="85.3">
 
             <div class="rider-top">
-                <div class="rider-name">서정원</div>
+                <div class="rider-name">
+                    서정원
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">29</b></div>
@@ -1594,6 +1660,34 @@ body {
             </div>
         </div>
         
+        <div class="rider-card offline"
+            data-team="소닉팀"
+            data-online="1"
+            data-name="성기창"
+            data-complete="25"
+            data-rate="100.0">
+
+            <div class="rider-top">
+                <div class="rider-name">
+                    성기창
+                    
+                </div>
+                <div class="badge offline-badge">오프라인</div>
+            </div>
+
+            <div class="rider-sub">소닉팀 | 오프라인</div>
+
+            <div class="rider-stats">
+                <div><span>완료</span><b class="blue">25</b></div>
+                <div><span>거절</span><b class="red">0</b></div>
+                <div><span>수락</span><b class="yellow">100.0%</b></div>
+                <div><span>오전</span><b>0</b></div>
+                <div><span>오후</span><b>0</b></div>
+                <div><span>저녁</span><b>0</b></div>
+                <div><span>심야</span><b>25</b></div>
+            </div>
+        </div>
+        
         <div class="rider-card offline warning"
             data-team="소닉팀"
             data-online="1"
@@ -1602,13 +1696,14 @@ body {
             data-rate="74.2">
 
             <div class="rider-top">
-                <div class="rider-name">박재현</div>
+                <div class="rider-name">
+                    박재현
+                    <span class='mini-warning'>⚠</span>
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">23</b></div>
@@ -1629,13 +1724,14 @@ body {
             data-rate="100.0">
 
             <div class="rider-top">
-                <div class="rider-name">김장현</div>
+                <div class="rider-name">
+                    김장현
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">8</b></div>
@@ -1656,13 +1752,14 @@ body {
             data-rate="87.5">
 
             <div class="rider-top">
-                <div class="rider-name">박정권</div>
+                <div class="rider-name">
+                    박정권
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">7</b></div>
@@ -1683,13 +1780,14 @@ body {
             data-rate="50.0">
 
             <div class="rider-top">
-                <div class="rider-name">김일수</div>
+                <div class="rider-name">
+                    김일수
+                    <span class='mini-warning'>⚠</span>
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">2</b></div>
@@ -1710,13 +1808,14 @@ body {
             data-rate="100.0">
 
             <div class="rider-top">
-                <div class="rider-name">노준우</div>
+                <div class="rider-name">
+                    노준우
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">1</b></div>
@@ -1729,7 +1828,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="소닉팀"
             data-online="1"
             data-name="강우기"
@@ -1737,13 +1836,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">강우기</div>
+                <div class="rider-name">
+                    강우기
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -1756,7 +1856,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="소닉팀"
             data-online="1"
             data-name="강준호"
@@ -1764,13 +1864,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">강준호</div>
+                <div class="rider-name">
+                    강준호
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -1783,7 +1884,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="소닉팀"
             data-online="1"
             data-name="곽동욱"
@@ -1791,13 +1892,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">곽동욱</div>
+                <div class="rider-name">
+                    곽동욱
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -1810,7 +1912,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="소닉팀"
             data-online="1"
             data-name="김도훈"
@@ -1818,13 +1920,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">김도훈</div>
+                <div class="rider-name">
+                    김도훈
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -1837,7 +1940,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="소닉팀"
             data-online="1"
             data-name="김동현"
@@ -1845,13 +1948,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">김동현</div>
+                <div class="rider-name">
+                    김동현
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -1864,7 +1968,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="소닉팀"
             data-online="1"
             data-name="김민"
@@ -1872,13 +1976,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">김민</div>
+                <div class="rider-name">
+                    김민
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -1891,7 +1996,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="소닉팀"
             data-online="1"
             data-name="김보규"
@@ -1899,13 +2004,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">김보규</div>
+                <div class="rider-name">
+                    김보규
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -1918,7 +2024,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="소닉팀"
             data-online="1"
             data-name="김상일"
@@ -1926,13 +2032,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">김상일</div>
+                <div class="rider-name">
+                    김상일
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -1945,7 +2052,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="소닉팀"
             data-online="1"
             data-name="김윤재"
@@ -1953,13 +2060,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">김윤재</div>
+                <div class="rider-name">
+                    김윤재
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -1972,7 +2080,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="소닉팀"
             data-online="1"
             data-name="김정호"
@@ -1980,13 +2088,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">김정호</div>
+                <div class="rider-name">
+                    김정호
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -1999,7 +2108,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="소닉팀"
             data-online="1"
             data-name="김희경"
@@ -2007,13 +2116,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">김희경</div>
+                <div class="rider-name">
+                    김희경
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -2026,7 +2136,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="소닉팀"
             data-online="1"
             data-name="박대진"
@@ -2034,13 +2144,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">박대진</div>
+                <div class="rider-name">
+                    박대진
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -2053,7 +2164,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="소닉팀"
             data-online="1"
             data-name="박동혁"
@@ -2061,13 +2172,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">박동혁</div>
+                <div class="rider-name">
+                    박동혁
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -2080,7 +2192,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="소닉팀"
             data-online="1"
             data-name="박성균"
@@ -2088,13 +2200,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">박성균</div>
+                <div class="rider-name">
+                    박성균
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -2107,7 +2220,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="소닉팀"
             data-online="1"
             data-name="박재현"
@@ -2115,13 +2228,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">박재현</div>
+                <div class="rider-name">
+                    박재현
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -2134,7 +2248,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="소닉팀"
             data-online="1"
             data-name="신정훈"
@@ -2142,13 +2256,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">신정훈</div>
+                <div class="rider-name">
+                    신정훈
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -2161,7 +2276,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="소닉팀"
             data-online="1"
             data-name="이근화"
@@ -2169,13 +2284,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">이근화</div>
+                <div class="rider-name">
+                    이근화
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -2188,7 +2304,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="소닉팀"
             data-online="1"
             data-name="이상원"
@@ -2196,13 +2312,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">이상원</div>
+                <div class="rider-name">
+                    이상원
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -2215,7 +2332,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="소닉팀"
             data-online="1"
             data-name="이승재"
@@ -2223,13 +2340,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">이승재</div>
+                <div class="rider-name">
+                    이승재
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -2242,7 +2360,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="소닉팀"
             data-online="1"
             data-name="이시현"
@@ -2250,13 +2368,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">이시현</div>
+                <div class="rider-name">
+                    이시현
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -2269,7 +2388,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="소닉팀"
             data-online="1"
             data-name="이영준"
@@ -2277,13 +2396,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">이영준</div>
+                <div class="rider-name">
+                    이영준
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -2296,7 +2416,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="소닉팀"
             data-online="1"
             data-name="이정빈"
@@ -2304,13 +2424,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">이정빈</div>
+                <div class="rider-name">
+                    이정빈
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -2323,7 +2444,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="소닉팀"
             data-online="1"
             data-name="정명길"
@@ -2331,13 +2452,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">정명길</div>
+                <div class="rider-name">
+                    정명길
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -2350,7 +2472,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="소닉팀"
             data-online="1"
             data-name="정창규"
@@ -2358,13 +2480,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">정창규</div>
+                <div class="rider-name">
+                    정창규
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -2377,7 +2500,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="소닉팀"
             data-online="1"
             data-name="조상홍"
@@ -2385,13 +2508,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">조상홍</div>
+                <div class="rider-name">
+                    조상홍
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -2404,7 +2528,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="소닉팀"
             data-online="1"
             data-name="조원규"
@@ -2412,13 +2536,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">조원규</div>
+                <div class="rider-name">
+                    조원규
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -2431,7 +2556,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="소닉팀"
             data-online="1"
             data-name="진우일"
@@ -2439,13 +2564,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">진우일</div>
+                <div class="rider-name">
+                    진우일
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -2458,7 +2584,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="소닉팀"
             data-online="1"
             data-name="최준수"
@@ -2466,13 +2592,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">최준수</div>
+                <div class="rider-name">
+                    최준수
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -2485,7 +2612,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="소닉팀"
             data-online="1"
             data-name="최준호"
@@ -2493,13 +2620,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">최준호</div>
+                <div class="rider-name">
+                    최준호
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -2512,7 +2640,7 @@ body {
             </div>
         </div>
         
-        <div class="rider-card offline warning"
+        <div class="rider-card offline"
             data-team="소닉팀"
             data-online="1"
             data-name="황정훈"
@@ -2520,13 +2648,14 @@ body {
             data-rate="0.0">
 
             <div class="rider-top">
-                <div class="rider-name">황정훈</div>
+                <div class="rider-name">
+                    황정훈
+                    
+                </div>
                 <div class="badge offline-badge">오프라인</div>
             </div>
 
             <div class="rider-sub">소닉팀 | 오프라인</div>
-
-            <div class='warn-box'>⚠ 수락률 80% 미만</div>
 
             <div class="rider-stats">
                 <div><span>완료</span><b class="blue">0</b></div>
@@ -2557,6 +2686,12 @@ function setFilter(value, btn) {
 
 function applySort() {
     applyView();
+}
+
+function moveRegion(url) {
+    if(url) {
+        window.location.href = url;
+    }
 }
 
 function applyView() {
