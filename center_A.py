@@ -23,7 +23,7 @@ SET_RULES = {
     "일": [33, 22, 35, 30],
 }
 
-TEAM_MAP_RAW = {
+TEAM_MAP = {
     "강우기": "소닉팀", "강준호": "소닉팀", "곽동욱": "소닉팀", "구민성": "넘버팀",
     "권예준": "소닉팀", "김광미": "넘버팀", "김도훈": "소닉팀", "김동현": "소닉팀",
     "김민": "소닉팀", "김병찬": "넘버팀", "김보규": "소닉팀", "김상일": "소닉팀",
@@ -35,18 +35,16 @@ TEAM_MAP_RAW = {
     "박정권": "소닉팀", "박진수": "넘버팀", "변영기": "소닉팀", "서정원": "소닉팀",
     "석윤미": "넘버팀", "성기창": "소닉팀", "손성기": "넘버팀", "신정훈": "소닉팀",
     "염용범": "넘버팀", "윤석훈": "소닉팀", "윤영훈": "소닉팀", "윤창현": "소닉팀",
-    "이경림": "넘버팀", "이경은": "넘버팀", "이국부": "소닉팀", "이국부": "소닉팀",
-    "이근화": "소닉팀", "이금형": "넘버팀", "이상원": "소닉팀", "이승재": "소닉팀",
-    "이시현": "소닉팀", "이영준": "소닉팀", "이재민": "소닉팀", "이정민": "넘버팀",
-    "이정빈": "소닉팀", "이창원": "넘버팀", "임현철": "소닉팀", "정명길": "소닉팀",
-    "정용운": "넘버팀", "정창규": "소닉팀", "조상홍": "소닉팀", "조영웅": "넘버팀",
-    "조원규": "소닉팀", "조정래": "넘버팀", "지덕근": "넘버팀", "진우일": "소닉팀",
-    "채기훈": "넘버팀", "천용진": "소닉팀", "천재원": "넘버팀", "최문호": "넘버팀",
-    "최순": "소닉팀", "최준수": "소닉팀", "최준호": "소닉팀", "최종용": "넘버팀",
-    "한창묵": "넘버팀", "황정훈": "소닉팀", "황주호": "소닉팀",
+    "이경림": "넘버팀", "이경은": "넘버팀", "이국부": "소닉팀", "이근화": "소닉팀",
+    "이금형": "넘버팀", "이상원": "소닉팀", "이승재": "소닉팀", "이시현": "소닉팀",
+    "이영준": "소닉팀", "이재민": "소닉팀", "이정민": "넘버팀", "이정빈": "소닉팀",
+    "이창원": "넘버팀", "임현철": "소닉팀", "정명길": "소닉팀", "정용운": "넘버팀",
+    "정창규": "소닉팀", "조상홍": "소닉팀", "조영웅": "넘버팀", "조원규": "소닉팀",
+    "조정래": "넘버팀", "지덕근": "넘버팀", "진우일": "소닉팀", "채기훈": "넘버팀",
+    "천용진": "소닉팀", "천재원": "넘버팀", "최문호": "넘버팀", "최순": "소닉팀",
+    "최준수": "소닉팀", "최준호": "소닉팀", "최종용": "넘버팀", "한창묵": "넘버팀",
+    "황정훈": "소닉팀", "황주호": "소닉팀",
 }
-
-TEAM_MAP = dict(TEAM_MAP_RAW)
 
 
 def today_korean_weekday():
@@ -89,6 +87,10 @@ def make_dashboard_html(df):
     morning_set, afternoon_set, dinner_set, night_set = SET_RULES[weekday]
 
     df["팀"] = df["이름"].apply(get_team)
+    df["개인수락률"] = df.apply(
+        lambda r: safe_rate(int(r["총완료"]), int(r["거절"]), int(r["취소"]), int(r["배달취소"])),
+        axis=1
+    )
 
     sonic_df = df[df["팀"] == "소닉팀"].copy()
     number_df = df[df["팀"] == "넘버팀"].copy()
@@ -124,7 +126,7 @@ def make_dashboard_html(df):
         return f"""
         <div class="peak-card">
             <div class="peak-title">
-                <div class="wing">S</div>
+                <img src="logo.png" class="small-logo">
                 <span>{title} ({total_value}/{total_target})</span>
             </div>
 
@@ -160,8 +162,14 @@ def make_dashboard_html(df):
         team = row["팀"]
         status = str(row["운행상태"])
         is_online = "운행중" in status
+        personal_rate = float(row["개인수락률"])
+        complete_count = int(row["총완료"])
+        is_warning = personal_rate < 80 and complete_count > 0
 
         card_class = "rider-card online" if is_online else "rider-card offline"
+        if is_warning:
+            card_class += " warning"
+
         badge_class = "badge online-badge" if is_online else "badge offline-badge"
         badge_text = "접속중" if is_online else "오프라인"
         online_sort = 0 if is_online else 1
@@ -171,18 +179,23 @@ def make_dashboard_html(df):
             data-team="{team}"
             data-online="{online_sort}"
             data-name="{name}"
-            data-complete="{int(row['총완료'])}">
+            data-complete="{complete_count}"
+            data-rate="{personal_rate}">
 
             <div class="rider-top">
-                <div class="rider-name">{name}</div>
+                <div class="rider-name">
+                    {name}
+                    {"<span class='mini-warning'>⚠</span>" if is_warning else ""}
+                </div>
                 <div class="{badge_class}">{badge_text}</div>
             </div>
 
             <div class="rider-sub">{team} | {badge_text}</div>
 
             <div class="rider-stats">
-                <div><span>완료</span><b class="blue">{int(row['총완료'])}</b></div>
+                <div><span>완료</span><b class="blue">{complete_count}</b></div>
                 <div><span>거절</span><b class="red">{int(row['거절'])}</b></div>
+                <div><span>수락</span><b class="yellow">{personal_rate}%</b></div>
                 <div><span>오전</span><b>{int(row['오전피크'])}</b></div>
                 <div><span>오후</span><b>{int(row['오후논피크'])}</b></div>
                 <div><span>저녁</span><b>{int(row['저녁피크'])}</b></div>
@@ -199,6 +212,10 @@ def make_dashboard_html(df):
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="refresh" content="60">
 <title>슈퍼소닉 중구A</title>
+<link rel="icon" href="logo.png">
+<meta property="og:title" content="슈퍼소닉 중구A 대시보드">
+<meta property="og:description" content="중구A 실시간 운영 현황">
+<meta property="og:image" content="logo.png">
 
 <style>
 * {{ box-sizing:border-box; }}
@@ -230,32 +247,16 @@ body {{
     font-weight:900;
 }}
 
-.mark {{
-    width:48px;
-    height:48px;
-    border-radius:50%;
-    background:#ff1630;
-    color:#fff;
+.top-logo {{
+    width:70px;
+    height:auto;
+}}
+
+.top-actions {{
     display:flex;
     align-items:center;
-    justify-content:center;
-    font-weight:900;
-    font-size:27px;
-    position:relative;
+    gap:12px;
 }}
-
-.mark:before,
-.mark:after {{
-    content:"";
-    position:absolute;
-    width:24px;
-    height:10px;
-    border-top:5px solid #ff1630;
-    top:16px;
-}}
-
-.mark:before {{ left:-23px; transform:rotate(24deg); }}
-.mark:after {{ right:-23px; transform:rotate(-24deg); }}
 
 .refresh {{
     color:#555;
@@ -265,39 +266,27 @@ body {{
     text-align:right;
 }}
 
+.region-nav select {{
+    padding:10px 14px;
+    border-radius:10px;
+    border:2px solid #111;
+    font-size:15px;
+    font-weight:900;
+    background:white;
+    cursor:pointer;
+}}
+
 .wrap {{
     max-width:1180px;
     margin:0 auto;
     padding:34px 18px 50px;
 }}
 
-.hero-logo {{
-    width:72px;
-    height:72px;
+.main-logo {{
+    width:220px;
+    display:block;
     margin:0 auto 12px;
-    border-radius:50%;
-    background:#ff1630;
-    color:#fff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:42px;
-    font-weight:900;
-    position:relative;
 }}
-
-.hero-logo:before,
-.hero-logo:after {{
-    content:"";
-    position:absolute;
-    width:38px;
-    height:15px;
-    border-top:7px solid #ff1630;
-    top:23px;
-}}
-
-.hero-logo:before {{ left:-36px; transform:rotate(24deg); }}
-.hero-logo:after {{ right:-36px; transform:rotate(-24deg); }}
 
 .title {{
     text-align:center;
@@ -310,7 +299,7 @@ body {{
     text-align:center;
     color:#666;
     font-size:14px;
-    margin-bottom:24px;
+    margin-bottom:22px;
 }}
 
 .summary {{
@@ -359,28 +348,21 @@ body {{
     border:3px solid #ff1630;
     border-radius:24px;
     padding:22px 34px 28px;
+    position:relative;
 }}
 
 .peak-title {{
     display:flex;
     align-items:center;
-    gap:16px;
+    gap:12px;
     font-size:28px;
     font-weight:900;
     margin-bottom:30px;
 }}
 
-.wing {{
-    width:34px;
-    height:34px;
-    border-radius:50%;
-    background:#ff1630;
-    color:white;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:900;
-    font-size:20px;
+.small-logo {{
+    width:42px;
+    height:auto;
 }}
 
 .bar-row {{
@@ -398,16 +380,25 @@ body {{
 
 .bar-wrap {{
     position:relative;
-    height:30px;
-    background:#ffd1d8;
+    height:34px;
+    background:linear-gradient(180deg,#f1f3f5,#dfe3e8);
     border-radius:999px;
     overflow:hidden;
+    box-shadow:
+        inset 0 2px 5px rgba(0,0,0,0.16),
+        0 1px 2px rgba(255,255,255,0.8);
 }}
 
 .bar-fill {{
     height:100%;
-    background:linear-gradient(90deg,#ff3b50,#ff1630);
+    background:
+        linear-gradient(180deg, rgba(255,255,255,0.48), rgba(255,255,255,0) 45%),
+        linear-gradient(90deg, #ff6b7a 0%, #ff1734 45%, #d90018 100%);
     border-radius:999px;
+    box-shadow:
+        inset 0 2px 3px rgba(255,255,255,0.45),
+        inset 0 -3px 5px rgba(120,0,0,0.25),
+        0 3px 8px rgba(255,22,48,0.35);
 }}
 
 .bar-text {{
@@ -416,8 +407,12 @@ body {{
     display:flex;
     align-items:center;
     justify-content:center;
-    font-size:20px;
-    font-weight:900;
+    font-size:22px;
+    font-weight:1000;
+    letter-spacing:-0.5px;
+    color:#111;
+    text-shadow:0 1px 1px rgba(255,255,255,0.65);
+    white-space:nowrap;
 }}
 
 .filter-area {{
@@ -456,6 +451,16 @@ body {{
     color:white;
 }}
 
+.search-input {{
+    flex:1;
+    min-width:220px;
+    padding:14px 18px;
+    border:2px solid #111;
+    border-radius:12px;
+    font-size:18px;
+    font-weight:800;
+}}
+
 .sort-box {{
     display:flex;
     align-items:center;
@@ -488,6 +493,7 @@ body {{
 
 .rider-card.online {{ border-color:#08c747; }}
 .rider-card.offline {{ border-color:#444; opacity:0.82; }}
+.rider-card.warning {{ box-shadow:0 0 0 3px rgba(230,0,18,0.18); }}
 
 .rider-top {{
     display:flex;
@@ -499,6 +505,24 @@ body {{
 .rider-name {{
     font-size:24px;
     font-weight:900;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    white-space:nowrap;
+}}
+
+.mini-warning {{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:22px;
+    height:22px;
+    border-radius:50%;
+    background:#e60012;
+    color:white;
+    font-size:13px;
+    font-weight:900;
+    flex:0 0 auto;
 }}
 
 .badge {{
@@ -531,8 +555,10 @@ body {{
     display:flex;
     gap:6px;
     align-items:center;
+    justify-content:center;
     font-size:14px;
     font-weight:800;
+    white-space:nowrap;
 }}
 
 .rider-stats b {{ font-size:18px; }}
@@ -546,10 +572,21 @@ body {{
 }}
 
 @media (max-width:900px) {{
-    .topbar {{ padding:12px 16px; flex-direction:column; gap:10px; }}
+    .topbar {{
+        padding:12px 16px;
+        flex-direction:column;
+        gap:10px;
+    }}
+
     .top-left {{ font-size:22px; }}
+    .top-actions {{
+        flex-direction:column;
+        gap:8px;
+    }}
     .refresh {{ text-align:center; }}
+    .region-nav select {{ width:180px; }}
     .title {{ font-size:34px; }}
+    .main-logo {{ width:180px; }}
     .summary-item {{ min-height:74px; padding:0 16px; font-size:16px; }}
     .summary-value {{ font-size:21px; }}
     .peaks {{ grid-template-columns:1fr; }}
@@ -558,7 +595,8 @@ body {{
     .bar-row {{ grid-template-columns:64px 1fr; }}
     .bar-label {{ font-size:23px; }}
     .control-row {{ display:block; }}
-    .tabs {{ margin-bottom:14px; }}
+    .tabs {{ margin-bottom:12px; }}
+    .search-input {{ width:100%; margin-bottom:12px; }}
     .sort-box {{ justify-content:space-between; }}
     .sort-select {{ width:180px; }}
     .riders {{ grid-template-columns:repeat(2,1fr); gap:12px; }}
@@ -576,15 +614,28 @@ body {{
 
 <div class="topbar">
     <div class="top-left">
-        <div class="mark">S</div>
+        <img src="logo.png" class="top-logo">
         <div>슈퍼소닉 중구A 대시보드</div>
     </div>
-    <div class="refresh">🔄 1분마다 자동 업데이트</div>
+
+    <div class="top-actions">
+        <div class="refresh">🔄 1분마다 자동 업데이트</div>
+
+        <div class="region-nav">
+            <select onchange="moveRegion(this.value)">
+                <option value="">권역 이동</option>
+                <option value="index.html">메인</option>
+                <option value="중구A_dashboard.html">중구A</option>
+                <option value="달서A_dashboard.html">달서A</option>
+                <option value="달서B_dashboard.html">달서B</option>
+            </select>
+        </div>
+    </div>
 </div>
 
 <div class="wrap">
 
-    <div class="hero-logo">S</div>
+    <img src="logo.png" class="main-logo">
     <h1 class="title">슈퍼소닉 중구A</h1>
     <div class="updated">🕘 {updated}</div>
 
@@ -610,6 +661,8 @@ body {{
                 <button class="tab" onclick="setFilter('소닉팀', this)">소닉팀 ({len(sonic_df)})</button>
                 <button class="tab" onclick="setFilter('넘버팀', this)">넘버팀 ({len(number_df)})</button>
             </div>
+
+            <input id="searchInput" class="search-input" placeholder="기사 검색 🔍" oninput="applyView()">
 
             <div class="sort-box">
                 <span>정렬</span>
@@ -642,17 +695,26 @@ function applySort() {{
     applyView();
 }}
 
+function moveRegion(url) {{
+    if(url) {{
+        window.location.href = url;
+    }}
+}}
+
 function applyView() {{
     const sortValue = document.getElementById("sortSelect").value;
+    const searchValue = document.getElementById("searchInput").value.trim();
     const container = document.getElementById("riders");
     const cards = Array.from(document.querySelectorAll(".rider-card"));
 
     cards.forEach(card => {{
         const team = card.dataset.team;
+        const name = card.dataset.name;
         let show = true;
 
         if(currentFilter === "소닉팀") show = team === "소닉팀";
         if(currentFilter === "넘버팀") show = team === "넘버팀";
+        if(searchValue && !name.includes(searchValue)) show = false;
 
         card.style.display = show ? "block" : "none";
     }});

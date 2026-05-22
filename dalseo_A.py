@@ -40,6 +40,10 @@ def today_korean_weekday():
     return ["월", "화", "수", "목", "금", "토", "일"][now.weekday()]
 
 
+def get_team(name):
+    return "달서팀" if str(name).strip() in DALSEO_TEAM else "소닉팀"
+
+
 def click_page(driver, page_number):
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
     time.sleep(1)
@@ -54,7 +58,6 @@ def click_page(driver, page_number):
     }
     return false;
     """
-
     clicked = driver.execute_script(script, str(page_number))
     time.sleep(4)
     return clicked
@@ -62,19 +65,21 @@ def click_page(driver, page_number):
 
 def safe_rate(complete, reject, cancel, delivery_cancel):
     total = complete + reject + cancel + delivery_cancel
-    if total <= 0:
-        return 0
-    return round((complete / total) * 100, 1)
+    return round((complete / total) * 100, 1) if total else 0
 
 
 def make_dashboard_html(df):
     weekday = today_korean_weekday()
     morning_set, afternoon_set, dinner_set, night_set = SET_RULES[weekday]
 
-    df["팀"] = df["이름"].apply(lambda x: "달서팀" if x in DALSEO_TEAM else "소닉팀")
+    df["팀"] = df["이름"].apply(get_team)
+    df["개인수락률"] = df.apply(
+        lambda r: safe_rate(int(r["총완료"]), int(r["거절"]), int(r["취소"]), int(r["배달취소"])),
+        axis=1
+    )
 
-    dalseo_df = df[df["팀"] == "달서팀"].copy()
     sonic_df = df[df["팀"] == "소닉팀"].copy()
+    dalseo_df = df[df["팀"] == "달서팀"].copy()
 
     total_complete = int(df["총완료"].sum())
     total_reject = int(df["거절"].sum())
@@ -93,9 +98,7 @@ def make_dashboard_html(df):
     updated = datetime.now().strftime("%Y.%m.%d %H:%M 기준")
 
     def width(value, target):
-        if target <= 0:
-            return 0
-        return min(round((value / target) * 100, 1), 100)
+        return min(round((value / target) * 100, 1), 100) if target else 0
 
     def peak_card(title, col, set_target):
         sonic_value = int(sonic_df[col].sum())
@@ -109,7 +112,7 @@ def make_dashboard_html(df):
         return f"""
         <div class="peak-card">
             <div class="peak-title">
-                <div class="wing">S</div>
+                <img src="logo.png" class="small-logo">
                 <span>{title} ({total_value}/{total_target})</span>
             </div>
 
@@ -145,8 +148,14 @@ def make_dashboard_html(df):
         team = row["팀"]
         status = str(row["운행상태"])
         is_online = "운행중" in status
+        personal_rate = float(row["개인수락률"])
+        complete_count = int(row["총완료"])
+        is_warning = personal_rate < 80 and complete_count > 0
 
         card_class = "rider-card online" if is_online else "rider-card offline"
+        if is_warning:
+            card_class += " warning"
+
         badge_class = "badge online-badge" if is_online else "badge offline-badge"
         badge_text = "접속중" if is_online else "오프라인"
         online_sort = 0 if is_online else 1
@@ -156,18 +165,23 @@ def make_dashboard_html(df):
             data-team="{team}"
             data-online="{online_sort}"
             data-name="{name}"
-            data-complete="{int(row['총완료'])}">
+            data-complete="{complete_count}"
+            data-rate="{personal_rate}">
 
             <div class="rider-top">
-                <div class="rider-name">{name}</div>
+                <div class="rider-name">
+                    {name}
+                    {"<span class='mini-warning'>⚠</span>" if is_warning else ""}
+                </div>
                 <div class="{badge_class}">{badge_text}</div>
             </div>
 
             <div class="rider-sub">{team} | {badge_text}</div>
 
             <div class="rider-stats">
-                <div><span>완료</span><b class="blue">{int(row['총완료'])}</b></div>
+                <div><span>완료</span><b class="blue">{complete_count}</b></div>
                 <div><span>거절</span><b class="red">{int(row['거절'])}</b></div>
+                <div><span>수락</span><b class="yellow">{personal_rate}%</b></div>
                 <div><span>오전</span><b>{int(row['오전피크'])}</b></div>
                 <div><span>오후</span><b>{int(row['오후논피크'])}</b></div>
                 <div><span>저녁</span><b>{int(row['저녁피크'])}</b></div>
@@ -184,6 +198,10 @@ def make_dashboard_html(df):
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="refresh" content="60">
 <title>슈퍼소닉 달서A</title>
+<link rel="icon" href="logo.png">
+<meta property="og:title" content="슈퍼소닉 달서A 대시보드">
+<meta property="og:description" content="달서A 실시간 운영 현황">
+<meta property="og:image" content="logo.png">
 
 <style>
 * {{ box-sizing:border-box; }}
@@ -215,38 +233,15 @@ body {{
     font-weight:900;
 }}
 
-.mark {{
-    width:48px;
-    height:48px;
-    border-radius:50%;
-    background:#ff1630;
-    color:#fff;
+.top-logo {{
+    width:70px;
+    height:auto;
+}}
+
+.top-actions {{
     display:flex;
     align-items:center;
-    justify-content:center;
-    font-weight:900;
-    font-size:27px;
-    position:relative;
-}}
-
-.mark:before,
-.mark:after {{
-    content:"";
-    position:absolute;
-    width:24px;
-    height:10px;
-    border-top:5px solid #ff1630;
-    top:16px;
-}}
-
-.mark:before {{
-    left:-23px;
-    transform:rotate(24deg);
-}}
-
-.mark:after {{
-    right:-23px;
-    transform:rotate(-24deg);
+    gap:12px;
 }}
 
 .refresh {{
@@ -257,45 +252,26 @@ body {{
     text-align:right;
 }}
 
+.region-nav select {{
+    padding:10px 14px;
+    border-radius:10px;
+    border:2px solid #111;
+    font-size:15px;
+    font-weight:900;
+    background:white;
+    cursor:pointer;
+}}
+
 .wrap {{
     max-width:1180px;
     margin:0 auto;
     padding:34px 18px 50px;
 }}
 
-.hero-logo {{
-    width:72px;
-    height:72px;
+.main-logo {{
+    width:220px;
+    display:block;
     margin:0 auto 12px;
-    border-radius:50%;
-    background:#ff1630;
-    color:#fff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:42px;
-    font-weight:900;
-    position:relative;
-}}
-
-.hero-logo:before,
-.hero-logo:after {{
-    content:"";
-    position:absolute;
-    width:38px;
-    height:15px;
-    border-top:7px solid #ff1630;
-    top:23px;
-}}
-
-.hero-logo:before {{
-    left:-36px;
-    transform:rotate(24deg);
-}}
-
-.hero-logo:after {{
-    right:-36px;
-    transform:rotate(-24deg);
 }}
 
 .title {{
@@ -309,7 +285,7 @@ body {{
     text-align:center;
     color:#666;
     font-size:14px;
-    margin-bottom:24px;
+    margin-bottom:22px;
 }}
 
 .summary {{
@@ -358,28 +334,21 @@ body {{
     border:3px solid #ff1630;
     border-radius:24px;
     padding:22px 34px 28px;
+    position:relative;
 }}
 
 .peak-title {{
     display:flex;
     align-items:center;
-    gap:16px;
+    gap:12px;
     font-size:28px;
     font-weight:900;
     margin-bottom:30px;
 }}
 
-.wing {{
-    width:34px;
-    height:34px;
-    border-radius:50%;
-    background:#ff1630;
-    color:white;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:900;
-    font-size:20px;
+.small-logo {{
+    width:42px;
+    height:auto;
 }}
 
 .bar-row {{
@@ -397,16 +366,25 @@ body {{
 
 .bar-wrap {{
     position:relative;
-    height:30px;
-    background:#ffd1d8;
+    height:34px;
+    background:linear-gradient(180deg,#f1f3f5,#dfe3e8);
     border-radius:999px;
     overflow:hidden;
+    box-shadow:
+        inset 0 2px 5px rgba(0,0,0,0.16),
+        0 1px 2px rgba(255,255,255,0.8);
 }}
 
 .bar-fill {{
     height:100%;
-    background:linear-gradient(90deg,#ff3b50,#ff1630);
+    background:
+        linear-gradient(180deg, rgba(255,255,255,0.48), rgba(255,255,255,0) 45%),
+        linear-gradient(90deg, #ff6b7a 0%, #ff1734 45%, #d90018 100%);
     border-radius:999px;
+    box-shadow:
+        inset 0 2px 3px rgba(255,255,255,0.45),
+        inset 0 -3px 5px rgba(120,0,0,0.25),
+        0 3px 8px rgba(255,22,48,0.35);
 }}
 
 .bar-text {{
@@ -415,8 +393,12 @@ body {{
     display:flex;
     align-items:center;
     justify-content:center;
-    font-size:20px;
-    font-weight:900;
+    font-size:22px;
+    font-weight:1000;
+    letter-spacing:-0.5px;
+    color:#111;
+    text-shadow:0 1px 1px rgba(255,255,255,0.65);
+    white-space:nowrap;
 }}
 
 .filter-area {{
@@ -455,6 +437,16 @@ body {{
     color:white;
 }}
 
+.search-input {{
+    flex:1;
+    min-width:220px;
+    padding:14px 18px;
+    border:2px solid #111;
+    border-radius:12px;
+    font-size:18px;
+    font-weight:800;
+}}
+
 .sort-box {{
     display:flex;
     align-items:center;
@@ -485,14 +477,9 @@ body {{
     background:white;
 }}
 
-.rider-card.online {{
-    border-color:#08c747;
-}}
-
-.rider-card.offline {{
-    border-color:#444;
-    opacity:0.82;
-}}
+.rider-card.online {{ border-color:#08c747; }}
+.rider-card.offline {{ border-color:#444; opacity:0.82; }}
+.rider-card.warning {{ box-shadow:0 0 0 3px rgba(230,0,18,0.18); }}
 
 .rider-top {{
     display:flex;
@@ -504,6 +491,24 @@ body {{
 .rider-name {{
     font-size:24px;
     font-weight:900;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    white-space:nowrap;
+}}
+
+.mini-warning {{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:22px;
+    height:22px;
+    border-radius:50%;
+    background:#e60012;
+    color:white;
+    font-size:13px;
+    font-weight:900;
+    flex:0 0 auto;
 }}
 
 .badge {{
@@ -536,13 +541,13 @@ body {{
     display:flex;
     gap:6px;
     align-items:center;
+    justify-content:center;
     font-size:14px;
     font-weight:800;
+    white-space:nowrap;
 }}
 
-.rider-stats b {{
-    font-size:18px;
-}}
+.rider-stats b {{ font-size:18px; }}
 
 .footer {{
     margin-top:28px;
@@ -559,83 +564,34 @@ body {{
         gap:10px;
     }}
 
-    .top-left {{
-        font-size:22px;
+    .top-left {{ font-size:22px; }}
+    .top-actions {{
+        flex-direction:column;
+        gap:8px;
     }}
-
-    .refresh {{
-        text-align:center;
-    }}
-
-    .title {{
-        font-size:34px;
-    }}
-
-    .summary-item {{
-        min-height:74px;
-        padding:0 16px;
-        font-size:16px;
-    }}
-
-    .summary-value {{
-        font-size:21px;
-    }}
-
-    .peaks {{
-        grid-template-columns:1fr;
-    }}
-
-    .peak-card {{
-        padding:20px 18px;
-    }}
-
-    .peak-title {{
-        font-size:24px;
-    }}
-
-    .bar-row {{
-        grid-template-columns:64px 1fr;
-    }}
-
-    .bar-label {{
-        font-size:23px;
-    }}
-
-    .control-row {{
-        display:block;
-    }}
-
-    .tabs {{
-        margin-bottom:14px;
-    }}
-
-    .sort-box {{
-        justify-content:space-between;
-    }}
-
-    .sort-select {{
-        width:180px;
-    }}
-
-    .riders {{
-        grid-template-columns:repeat(2,1fr);
-        gap:12px;
-    }}
-
-    .rider-name {{
-        font-size:20px;
-    }}
-
-    .tab {{
-        font-size:17px;
-        padding:12px 16px;
-    }}
+    .refresh {{ text-align:center; }}
+    .region-nav select {{ width:180px; }}
+    .title {{ font-size:34px; }}
+    .main-logo {{ width:180px; }}
+    .summary-item {{ min-height:74px; padding:0 16px; font-size:16px; }}
+    .summary-value {{ font-size:21px; }}
+    .peaks {{ grid-template-columns:1fr; }}
+    .peak-card {{ padding:20px 18px; }}
+    .peak-title {{ font-size:24px; }}
+    .bar-row {{ grid-template-columns:64px 1fr; }}
+    .bar-label {{ font-size:23px; }}
+    .control-row {{ display:block; }}
+    .tabs {{ margin-bottom:12px; }}
+    .search-input {{ width:100%; margin-bottom:12px; }}
+    .sort-box {{ justify-content:space-between; }}
+    .sort-select {{ width:180px; }}
+    .riders {{ grid-template-columns:repeat(2,1fr); gap:12px; }}
+    .rider-name {{ font-size:20px; }}
+    .tab {{ font-size:17px; padding:12px 16px; }}
 }}
 
 @media (max-width:520px) {{
-    .riders {{
-        grid-template-columns:1fr;
-    }}
+    .riders {{ grid-template-columns:1fr; }}
 }}
 </style>
 </head>
@@ -644,18 +600,28 @@ body {{
 
 <div class="topbar">
     <div class="top-left">
-        <div class="mark">S</div>
+        <img src="logo.png" class="top-logo">
         <div>슈퍼소닉 달서A 대시보드</div>
     </div>
 
-    <div class="refresh">
-        🔄 1분마다 자동 업데이트
+    <div class="top-actions">
+        <div class="refresh">🔄 1분마다 자동 업데이트</div>
+
+        <div class="region-nav">
+            <select onchange="moveRegion(this.value)">
+                <option value="">권역 이동</option>
+                <option value="index.html">메인</option>
+                <option value="중구A_dashboard.html">중구A</option>
+                <option value="달서A_dashboard.html">달서A</option>
+                <option value="달서B_dashboard.html">달서B</option>
+            </select>
+        </div>
     </div>
 </div>
 
 <div class="wrap">
 
-    <div class="hero-logo">S</div>
+    <img src="logo.png" class="main-logo">
     <h1 class="title">슈퍼소닉 달서A</h1>
     <div class="updated">🕘 {updated}</div>
 
@@ -672,9 +638,7 @@ body {{
         <div class="summary-item"><span>달서팀</span><b class="summary-value green">{dalseo_running}명</b></div>
     </div>
 
-    <div class="peaks">
-        {peak_cards}
-    </div>
+    <div class="peaks">{peak_cards}</div>
 
     <div class="filter-area">
         <div class="control-row">
@@ -683,6 +647,8 @@ body {{
                 <button class="tab" onclick="setFilter('소닉팀', this)">소닉팀 ({len(sonic_df)})</button>
                 <button class="tab" onclick="setFilter('달서팀', this)">달서팀 ({len(dalseo_df)})</button>
             </div>
+
+            <input id="searchInput" class="search-input" placeholder="기사 검색 🔍" oninput="applyView()">
 
             <div class="sort-box">
                 <span>정렬</span>
@@ -694,9 +660,7 @@ body {{
             </div>
         </div>
 
-        <div id="riders" class="riders">
-            {rider_cards}
-        </div>
+        <div id="riders" class="riders">{rider_cards}</div>
     </div>
 
     <div class="footer">실시간 데이터 · 1분마다 자동 업데이트</div>
@@ -708,10 +672,8 @@ let currentFilter = "전체";
 
 function setFilter(value, btn) {{
     currentFilter = value;
-
     document.querySelectorAll(".tab").forEach(item => item.classList.remove("active"));
     btn.classList.add("active");
-
     applyView();
 }}
 
@@ -719,17 +681,26 @@ function applySort() {{
     applyView();
 }}
 
+function moveRegion(url) {{
+    if(url) {{
+        window.location.href = url;
+    }}
+}}
+
 function applyView() {{
     const sortValue = document.getElementById("sortSelect").value;
+    const searchValue = document.getElementById("searchInput").value.trim();
     const container = document.getElementById("riders");
     const cards = Array.from(document.querySelectorAll(".rider-card"));
 
     cards.forEach(card => {{
         const team = card.dataset.team;
+        const name = card.dataset.name;
         let show = true;
 
         if(currentFilter === "소닉팀") show = team === "소닉팀";
         if(currentFilter === "달서팀") show = team === "달서팀";
+        if(searchValue && !name.includes(searchValue)) show = false;
 
         card.style.display = show ? "block" : "none";
     }});
@@ -740,13 +711,8 @@ function applyView() {{
         if(sortValue === "online") {{
             const onlineA = Number(a.dataset.online);
             const onlineB = Number(b.dataset.online);
-
             if(onlineA !== onlineB) return onlineA - onlineB;
-
-            const completeA = Number(a.dataset.complete);
-            const completeB = Number(b.dataset.complete);
-
-            return completeB - completeA;
+            return Number(b.dataset.complete) - Number(a.dataset.complete);
         }}
 
         if(sortValue === "name") {{
@@ -790,8 +756,9 @@ def save_excel(results):
 
     df = pd.DataFrame(results).drop_duplicates()
 
+    df["팀"] = df["이름"].apply(get_team)
     df["정렬순서"] = df["운행상태"].apply(lambda x: 0 if "운행중" in str(x) else 1)
-    df = df.sort_values(by=["정렬순서", "총완료", "이름"], ascending=[True, False, True])
+    df = df.sort_values(by=["정렬순서", "팀", "총완료", "이름"], ascending=[True, True, False, True])
     df = df.drop(columns=["정렬순서"])
 
     total_row = {
@@ -806,6 +773,7 @@ def save_excel(results):
         "저녁피크": df["저녁피크"].sum(),
         "심야논피크": df["심야논피크"].sum(),
         "아이디": "",
+        "팀": "",
     }
 
     excel_df = pd.concat([df, pd.DataFrame([total_row])], ignore_index=True)
@@ -834,7 +802,6 @@ def collect_current_pages(driver):
 
         for row in rows:
             text = row.text.strip()
-
             if not text:
                 continue
 
@@ -842,8 +809,10 @@ def collect_current_pages(driver):
 
             try:
                 if len(data) >= 11 and data[0] != "합계":
+                    name = data[0].strip()
+
                     results.append({
-                        "이름": data[0],
+                        "이름": name,
                         "운행상태": data[1],
                         "총완료": int(data[3]),
                         "거절": int(data[4]),
@@ -856,7 +825,7 @@ def collect_current_pages(driver):
                         "아이디": data[11] if len(data) > 11 else "",
                     })
 
-                    print(f"저장: {data[0]}")
+                    print(f"저장: {name} / {get_team(name)}")
 
             except:
                 pass

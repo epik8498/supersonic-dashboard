@@ -6,6 +6,7 @@ from selenium.webdriver.common.by import By
 import pandas as pd
 import time
 import subprocess
+import math
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -29,42 +30,59 @@ TEAM_SETS = {
     "슈퍼": 2,
 }
 
-TEAM_MAP_RAW = {
-    "유호성":"넘버","박세창":"넘버","강명원":"넘버","김수진":"넘버","배서후":"넘버","김요한":"넘버",
-    "김정근":"넘버","남승호":"넘버","이헌재":"넘버","이윤재":"넘버","정수영":"넘버","장정석":"넘버",
-    "최영진":"넘버","임현석":"넘버","임승범":"넘버","이태훈":"넘버","이철우":"넘버","이재헌":"넘버",
-    "이은성":"넘버","이영희":"넘버","이선노":"넘버","이동석":"넘버","우효상":"넘버","서강원":"넘버",
-    "한동훈":"넘버","마경민":"넘버","노재권":"넘버","남윤정":"넘버","남동욱":"넘버","김현준":"넘버",
-    "김태하":"넘버","김종희":"넘버","김용운":"넘버","김영천":"넘버","김병수":"넘버","김명한":"넘버",
-    "김동국":"넘버","권오현":"넘버","황홍섭":"넘버","강지은":"넘버","최윤호":"넘버","신명섭":"넘버",
-    "윤민석":"넘버","김애선":"넘버","이대겸":"넘버","김대운":"넘버",
+TEAM_MAP = {
+    # 넘버
+    "유호성": "넘버", "박세창": "넘버", "강명원": "넘버", "김수진": "넘버",
+    "배서후": "넘버", "김요한": "넘버", "김정근": "넘버", "남승호": "넘버",
+    "이헌재": "넘버", "이윤재": "넘버", "정수영": "넘버", "장정석": "넘버",
+    "최영진": "넘버", "임현석": "넘버", "임승범": "넘버", "이태훈": "넘버",
+    "이철우": "넘버", "이재헌": "넘버", "이은성": "넘버", "이영희": "넘버",
+    "이선노": "넘버", "이동석": "넘버", "우효상": "넘버", "서강원": "넘버",
+    "한동훈": "넘버", "마경민": "넘버", "노재권": "넘버", "남윤정": "넘버",
+    "남동욱": "넘버", "김현준": "넘버", "김태하": "넘버", "김종희": "넘버",
+    "김용운": "넘버", "김영천": "넘버", "김병수": "넘버", "김명한": "넘버",
+    "김동국": "넘버", "권오현": "넘버", "황홍섭": "넘버", "강지은": "넘버",
+    "최윤호": "넘버", "신명섭": "넘버", "윤민석": "넘버", "김애선": "넘버",
+    "이대겸": "넘버", "김대운": "넘버", "한창목": "넘버",
 
-    "길강호":"마음","김영우":"마음","강지우":"마음","이승훈":"마음","박성립":"마음","이영민":"마음",
-    "손성곤":"마음","구상훈":"마음","박한울":"마음","신가희":"마음","박연호":"마음","김형택":"마음",
-    "김낙훈":"마음","권영남":"마음","이진복":"마음","김석원":"마음","길태빈":"마음","김창범":"마음",
-    "박광용":"마음","성영길":"마음","박원희":"마음","임용우":"마음","최영우":"마음","이전필":"마음",
-    "이재현":"마음","이강현":"마음","김대환":"마음","여세동":"마음","신정학":"마음","임지훈":"마음",
-    "장민서":"마음","임종헌":"마음","윤동근":"마음","도수현":"마음","김동현":"마음","정동진":"마음",
-    "정동수":"마음","전현":"마음","전하경":"마음","전승옥":"마음","전대명":"마음","장예환":"마음",
-    "장대웅":"마음","임재백":"마음","이진욱":"마음","이진승":"마음","이승준":"마음","이경태":"마음",
-    "최현준":"마음","안호식":"마음","신원준":"마음","서봉용":"마음","박호일":"마음","박성우":"마음",
-    "도인환":"마음","노지훈":"마음","김현진":"마음","김지성":"마음","김재훈":"마음","황유경":"마음",
-    "김성현":"마음","김서현":"마음","김효겸":"마음","송인섭":"마음","김종서":"마음","김종호":"마음",
-    "남재화":"마음","박남아":"마음","구용태":"마음","한대성":"마음","윤정원":"마음","손지수":"마음",
-    "김숙자":"마음","김현숙":"마음","최종현":"마음","김인수":"마음","김임식":"마음","신인호":"마음",
-    "구자돈":"마음","백병준":"마음","차무길":"마음","차성원":"마음","박지홍":"마음","이예준":"마음",
-    "위석훈":"마음","피우덕":"마음","소귀숙":"마음","피우정":"마음","백창열":"마음","하태수":"마음",
-    "명제규":"마음","한희숙":"마음","김동욱":"마음","김도형":"마음",
+    # 마음
+    "길강호": "마음", "김영우": "마음", "강지우": "마음", "이승훈": "마음",
+    "박성립": "마음", "이영민": "마음", "손성곤": "마음", "구상훈": "마음",
+    "박한울": "마음", "신가희": "마음", "박연호": "마음", "김형택": "마음",
+    "김낙훈": "마음", "권영남": "마음", "이진복": "마음", "김석원": "마음",
+    "길태빈": "마음", "김창범": "마음", "박광용": "마음", "성영길": "마음",
+    "박원희": "마음", "임용우": "마음", "최영우": "마음", "이전필": "마음",
+    "이재현": "마음", "이강현": "마음", "김대환": "마음", "여세동": "마음",
+    "신정학": "마음", "임지훈": "마음", "장민서": "마음", "임종헌": "마음",
+    "윤동근": "마음", "도수현": "마음", "김동현": "마음", "정동진": "마음",
+    "정동수": "마음", "전현": "마음", "전하경": "마음", "전승옥": "마음",
+    "전대명": "마음", "장예환": "마음", "장대웅": "마음", "임재백": "마음",
+    "이진욱": "마음", "이진승": "마음", "이승준": "마음", "이경태": "마음",
+    "최현준": "마음", "안호식": "마음", "신원준": "마음", "서봉용": "마음",
+    "박호일": "마음", "박성우": "마음", "도인환": "마음", "노지훈": "마음",
+    "김현진": "마음", "김지성": "마음", "김재훈": "마음", "황유경": "마음",
+    "김성현": "마음", "김서현": "마음", "김효겸": "마음", "송인섭": "마음",
+    "김종서": "마음", "김종호": "마음", "남재화": "마음", "박남아": "마음",
+    "구용태": "마음", "한대성": "마음", "윤정원": "마음", "손지수": "마음",
+    "김숙자": "마음", "김현숙": "마음", "최종현": "마음", "김인수": "마음",
+    "김임식": "마음", "신인호": "마음", "구자돈": "마음", "백병준": "마음",
+    "차무길": "마음", "차성원": "마음", "박지홍": "마음", "이예준": "마음",
+    "위석훈": "마음", "피우덕": "마음", "소귀숙": "마음", "피우정": "마음",
+    "백창열": "마음", "하태수": "마음", "명제규": "마음", "한희숙": "마음",
+    "김동욱": "마음", "김도형": "마음", "문영신": "마음", "곽봉수": "마음",
+    "장민규": "마음",
 
-    "최경민":"슈퍼","윤규범":"슈퍼","신성욱":"슈퍼","박무성":"슈퍼","송특근":"슈퍼","정우혁":"슈퍼",
-    "김경섭":"슈퍼","장근영":"슈퍼","조윤환":"슈퍼","조승래":"슈퍼","정기정":"슈퍼","정규태":"슈퍼",
-    "장재근":"슈퍼","최지나":"슈퍼","이종필":"슈퍼","이정민":"슈퍼","이재상":"슈퍼","이재관":"슈퍼",
-    "윤철훈":"슈퍼","유영엽":"슈퍼","엄정철":"슈퍼","심재득":"슈퍼","신진학":"슈퍼","배준호":"슈퍼",
-    "박정민":"슈퍼","김주동":"슈퍼","김재현":"슈퍼","김상엽":"슈퍼","김동규":"슈퍼","권휘재":"슈퍼",
-    "강현구":"슈퍼","최지웅":"슈퍼","김종찬":"슈퍼","이상엽":"슈퍼",
+    # 슈퍼
+    "최경민": "슈퍼", "윤규범": "슈퍼", "신성욱": "슈퍼", "박무성": "슈퍼",
+    "송특근": "슈퍼", "정우혁": "슈퍼", "김경섭": "슈퍼", "장근영": "슈퍼",
+    "조윤환": "슈퍼", "조승래": "슈퍼", "정기정": "슈퍼", "정규태": "슈퍼",
+    "장재근": "슈퍼", "최지나": "슈퍼", "이종필": "슈퍼", "이정민": "슈퍼",
+    "이재상": "슈퍼", "이재관": "슈퍼", "윤철훈": "슈퍼", "유영엽": "슈퍼",
+    "엄정철": "슈퍼", "심재득": "슈퍼", "신진학": "슈퍼", "배준호": "슈퍼",
+    "박정민": "슈퍼", "김주동": "슈퍼", "김재현": "슈퍼", "김상엽": "슈퍼",
+    "김동규": "슈퍼", "권휘재": "슈퍼", "강현구": "슈퍼", "최지웅": "슈퍼",
+    "김종찬": "슈퍼", "이상엽": "슈퍼",
 }
-
-TEAM_MAP = dict(TEAM_MAP_RAW)
 
 
 def today_korean_weekday():
@@ -107,6 +125,10 @@ def make_dashboard_html(df):
     morning_set, afternoon_set, dinner_set, night_set = SET_RULES[weekday]
 
     df["팀"] = df["이름"].apply(get_team)
+    df["개인수락률"] = df.apply(
+        lambda r: safe_rate(int(r["총완료"]), int(r["거절"]), int(r["취소"]), int(r["배달취소"])),
+        axis=1
+    )
 
     number_df = df[df["팀"] == "넘버"].copy()
     maeum_df = df[df["팀"] == "마음"].copy()
@@ -139,12 +161,12 @@ def make_dashboard_html(df):
         super_value = int(super_df[col].sum())
         unknown_value = int(unknown_df[col].sum())
 
-        number_target = set_target * TEAM_SETS["넘버"]
-        maeum_target = set_target * TEAM_SETS["마음"]
-        super_target = set_target * TEAM_SETS["슈퍼"]
+        number_target = math.ceil(set_target * TEAM_SETS["넘버"])
+        maeum_target = math.ceil(set_target * TEAM_SETS["마음"])
+        super_target = math.ceil(set_target * TEAM_SETS["슈퍼"])
 
         total_value = number_value + maeum_value + super_value + unknown_value
-        total_target = set_target * 13
+        total_target = number_target + maeum_target + super_target
 
         unknown_html = ""
         if unknown_value > 0:
@@ -161,7 +183,7 @@ def make_dashboard_html(df):
         return f"""
         <div class="peak-card">
             <div class="peak-title">
-                <div class="wing">S</div>
+                <img src="logo.png" class="small-logo">
                 <span>{title} ({total_value}/{total_target})</span>
             </div>
 
@@ -207,8 +229,14 @@ def make_dashboard_html(df):
         team = row["팀"]
         status = str(row["운행상태"])
         is_online = "운행중" in status
+        personal_rate = float(row["개인수락률"])
+        complete_count = int(row["총완료"])
+        is_warning = personal_rate < 80 and complete_count > 0
 
         card_class = "rider-card online" if is_online else "rider-card offline"
+        if is_warning:
+            card_class += " warning"
+
         badge_class = "badge online-badge" if is_online else "badge offline-badge"
         badge_text = "접속중" if is_online else "오프라인"
         online_sort = 0 if is_online else 1
@@ -218,18 +246,23 @@ def make_dashboard_html(df):
             data-team="{team}"
             data-online="{online_sort}"
             data-name="{name}"
-            data-complete="{int(row['총완료'])}">
+            data-complete="{complete_count}"
+            data-rate="{personal_rate}">
 
             <div class="rider-top">
-                <div class="rider-name">{name}</div>
+                <div class="rider-name">
+                    {name}
+                    {"<span class='mini-warning'>⚠</span>" if is_warning else ""}
+                </div>
                 <div class="{badge_class}">{badge_text}</div>
             </div>
 
             <div class="rider-sub">{team} | {badge_text}</div>
 
             <div class="rider-stats">
-                <div><span>완료</span><b class="blue">{int(row['총완료'])}</b></div>
+                <div><span>완료</span><b class="blue">{complete_count}</b></div>
                 <div><span>거절</span><b class="red">{int(row['거절'])}</b></div>
+                <div><span>수락</span><b class="yellow">{personal_rate}%</b></div>
                 <div><span>오전</span><b>{int(row['오전피크'])}</b></div>
                 <div><span>오후</span><b>{int(row['오후논피크'])}</b></div>
                 <div><span>저녁</span><b>{int(row['저녁피크'])}</b></div>
@@ -246,6 +279,10 @@ def make_dashboard_html(df):
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="refresh" content="60">
 <title>슈퍼소닉 달서B</title>
+<link rel="icon" href="logo.png">
+<meta property="og:title" content="슈퍼소닉 달서B 대시보드">
+<meta property="og:description" content="달서B 실시간 운영 현황">
+<meta property="og:image" content="logo.png">
 
 <style>
 * {{ box-sizing:border-box; }}
@@ -277,32 +314,16 @@ body {{
     font-weight:900;
 }}
 
-.mark {{
-    width:48px;
-    height:48px;
-    border-radius:50%;
-    background:#ff1630;
-    color:#fff;
+.top-logo {{
+    width:70px;
+    height:auto;
+}}
+
+.top-actions {{
     display:flex;
     align-items:center;
-    justify-content:center;
-    font-weight:900;
-    font-size:27px;
-    position:relative;
+    gap:12px;
 }}
-
-.mark:before,
-.mark:after {{
-    content:"";
-    position:absolute;
-    width:24px;
-    height:10px;
-    border-top:5px solid #ff1630;
-    top:16px;
-}}
-
-.mark:before {{ left:-23px; transform:rotate(24deg); }}
-.mark:after {{ right:-23px; transform:rotate(-24deg); }}
 
 .refresh {{
     color:#555;
@@ -312,39 +333,27 @@ body {{
     text-align:right;
 }}
 
+.region-nav select {{
+    padding:10px 14px;
+    border-radius:10px;
+    border:2px solid #111;
+    font-size:15px;
+    font-weight:900;
+    background:white;
+    cursor:pointer;
+}}
+
 .wrap {{
     max-width:1180px;
     margin:0 auto;
     padding:34px 18px 50px;
 }}
 
-.hero-logo {{
-    width:72px;
-    height:72px;
+.main-logo {{
+    width:220px;
+    display:block;
     margin:0 auto 12px;
-    border-radius:50%;
-    background:#ff1630;
-    color:#fff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:42px;
-    font-weight:900;
-    position:relative;
 }}
-
-.hero-logo:before,
-.hero-logo:after {{
-    content:"";
-    position:absolute;
-    width:38px;
-    height:15px;
-    border-top:7px solid #ff1630;
-    top:23px;
-}}
-
-.hero-logo:before {{ left:-36px; transform:rotate(24deg); }}
-.hero-logo:after {{ right:-36px; transform:rotate(-24deg); }}
 
 .title {{
     text-align:center;
@@ -357,7 +366,7 @@ body {{
     text-align:center;
     color:#666;
     font-size:14px;
-    margin-bottom:24px;
+    margin-bottom:22px;
 }}
 
 .summary {{
@@ -406,28 +415,21 @@ body {{
     border:3px solid #ff1630;
     border-radius:24px;
     padding:22px 34px 28px;
+    position:relative;
 }}
 
 .peak-title {{
     display:flex;
     align-items:center;
-    gap:16px;
+    gap:12px;
     font-size:28px;
     font-weight:900;
     margin-bottom:30px;
 }}
 
-.wing {{
-    width:34px;
-    height:34px;
-    border-radius:50%;
-    background:#ff1630;
-    color:white;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:900;
-    font-size:20px;
+.small-logo {{
+    width:42px;
+    height:auto;
 }}
 
 .bar-row {{
@@ -445,16 +447,25 @@ body {{
 
 .bar-wrap {{
     position:relative;
-    height:30px;
-    background:#ffd1d8;
+    height:34px;
+    background:linear-gradient(180deg,#f1f3f5,#dfe3e8);
     border-radius:999px;
     overflow:hidden;
+    box-shadow:
+        inset 0 2px 5px rgba(0,0,0,0.16),
+        0 1px 2px rgba(255,255,255,0.8);
 }}
 
 .bar-fill {{
     height:100%;
-    background:linear-gradient(90deg,#ff3b50,#ff1630);
+    background:
+        linear-gradient(180deg, rgba(255,255,255,0.48), rgba(255,255,255,0) 45%),
+        linear-gradient(90deg, #ff6b7a 0%, #ff1734 45%, #d90018 100%);
     border-radius:999px;
+    box-shadow:
+        inset 0 2px 3px rgba(255,255,255,0.45),
+        inset 0 -3px 5px rgba(120,0,0,0.25),
+        0 3px 8px rgba(255,22,48,0.35);
 }}
 
 .gray-fill {{
@@ -467,8 +478,12 @@ body {{
     display:flex;
     align-items:center;
     justify-content:center;
-    font-size:20px;
-    font-weight:900;
+    font-size:22px;
+    font-weight:1000;
+    letter-spacing:-0.5px;
+    color:#111;
+    text-shadow:0 1px 1px rgba(255,255,255,0.65);
+    white-space:nowrap;
 }}
 
 .filter-area {{
@@ -507,6 +522,16 @@ body {{
     color:white;
 }}
 
+.search-input {{
+    flex:1;
+    min-width:220px;
+    padding:14px 18px;
+    border:2px solid #111;
+    border-radius:12px;
+    font-size:18px;
+    font-weight:800;
+}}
+
 .sort-box {{
     display:flex;
     align-items:center;
@@ -539,6 +564,7 @@ body {{
 
 .rider-card.online {{ border-color:#08c747; }}
 .rider-card.offline {{ border-color:#444; opacity:0.82; }}
+.rider-card.warning {{ box-shadow:0 0 0 3px rgba(230,0,18,0.18); }}
 
 .rider-top {{
     display:flex;
@@ -550,6 +576,24 @@ body {{
 .rider-name {{
     font-size:24px;
     font-weight:900;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    white-space:nowrap;
+}}
+
+.mini-warning {{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:22px;
+    height:22px;
+    border-radius:50%;
+    background:#e60012;
+    color:white;
+    font-size:13px;
+    font-weight:900;
+    flex:0 0 auto;
 }}
 
 .badge {{
@@ -582,8 +626,10 @@ body {{
     display:flex;
     gap:6px;
     align-items:center;
+    justify-content:center;
     font-size:14px;
     font-weight:800;
+    white-space:nowrap;
 }}
 
 .rider-stats b {{ font-size:18px; }}
@@ -597,10 +643,21 @@ body {{
 }}
 
 @media (max-width:900px) {{
-    .topbar {{ padding:12px 16px; flex-direction:column; gap:10px; }}
+    .topbar {{
+        padding:12px 16px;
+        flex-direction:column;
+        gap:10px;
+    }}
+
     .top-left {{ font-size:22px; }}
+    .top-actions {{
+        flex-direction:column;
+        gap:8px;
+    }}
     .refresh {{ text-align:center; }}
+    .region-nav select {{ width:180px; }}
     .title {{ font-size:34px; }}
+    .main-logo {{ width:180px; }}
     .summary-item {{ min-height:74px; padding:0 16px; font-size:16px; }}
     .summary-value {{ font-size:21px; }}
     .peaks {{ grid-template-columns:1fr; }}
@@ -609,7 +666,8 @@ body {{
     .bar-row {{ grid-template-columns:64px 1fr; }}
     .bar-label {{ font-size:23px; }}
     .control-row {{ display:block; }}
-    .tabs {{ margin-bottom:14px; }}
+    .tabs {{ margin-bottom:12px; }}
+    .search-input {{ width:100%; margin-bottom:12px; }}
     .sort-box {{ justify-content:space-between; }}
     .sort-select {{ width:180px; }}
     .riders {{ grid-template-columns:repeat(2,1fr); gap:12px; }}
@@ -627,15 +685,28 @@ body {{
 
 <div class="topbar">
     <div class="top-left">
-        <div class="mark">S</div>
+        <img src="logo.png" class="top-logo">
         <div>슈퍼소닉 달서B 대시보드</div>
     </div>
-    <div class="refresh">🔄 1분마다 자동 업데이트</div>
+
+    <div class="top-actions">
+        <div class="refresh">🔄 1분마다 자동 업데이트</div>
+
+        <div class="region-nav">
+            <select onchange="moveRegion(this.value)">
+                <option value="">권역 이동</option>
+                <option value="index.html">메인</option>
+                <option value="중구A_dashboard.html">중구A</option>
+                <option value="달서A_dashboard.html">달서A</option>
+                <option value="달서B_dashboard.html">달서B</option>
+            </select>
+        </div>
+    </div>
 </div>
 
 <div class="wrap">
 
-    <div class="hero-logo">S</div>
+    <img src="logo.png" class="main-logo">
     <h1 class="title">슈퍼소닉 달서B</h1>
     <div class="updated">🕘 {updated}</div>
 
@@ -662,7 +733,10 @@ body {{
                 <button class="tab" onclick="setFilter('넘버', this)">넘버 ({len(number_df)})</button>
                 <button class="tab" onclick="setFilter('마음', this)">마음 ({len(maeum_df)})</button>
                 <button class="tab" onclick="setFilter('슈퍼', this)">슈퍼 ({len(super_df)})</button>
+                <button class="tab" onclick="setFilter('미분류', this)">미분류 ({len(unknown_df)})</button>
             </div>
+
+            <input id="searchInput" class="search-input" placeholder="기사 검색 🔍" oninput="applyView()">
 
             <div class="sort-box">
                 <span>정렬</span>
@@ -695,18 +769,28 @@ function applySort() {{
     applyView();
 }}
 
+function moveRegion(url) {{
+    if(url) {{
+        window.location.href = url;
+    }}
+}}
+
 function applyView() {{
     const sortValue = document.getElementById("sortSelect").value;
+    const searchValue = document.getElementById("searchInput").value.trim();
     const container = document.getElementById("riders");
     const cards = Array.from(document.querySelectorAll(".rider-card"));
 
     cards.forEach(card => {{
         const team = card.dataset.team;
+        const name = card.dataset.name;
         let show = true;
 
         if(currentFilter === "넘버") show = team === "넘버";
         if(currentFilter === "마음") show = team === "마음";
         if(currentFilter === "슈퍼") show = team === "슈퍼";
+        if(currentFilter === "미분류") show = team === "미분류";
+        if(searchValue && !name.includes(searchValue)) show = false;
 
         card.style.display = show ? "block" : "none";
     }});
