@@ -435,7 +435,7 @@ body {
 
     <img src="logo.png" class="main-logo">
     <h1 class="title">슈퍼소닉 달서B</h1>
-    <div class="updated">🕘 2026.05.23 04:01 기준</div>
+    <div class="updated">🕘 2026.05.23 04:03 기준</div>
 
     <div class="summary">
         <div class="summary-item"><span>총완료</span><b class="summary-value red">2,245</b></div>
@@ -445,8 +445,8 @@ body {
         <div class="summary-item"><span>주간수락률</span><b class="summary-value yellow">84.5%</b></div>
         <div class="summary-item"><span>당일수락률</span><b class="summary-value blue">84.5%</b></div>
         <div class="summary-item"><span>거절가능</span><b class="summary-value yellow">150개</b></div>
-        <div class="summary-item"><span>전체접속</span><b class="summary-value green">1명</b></div>
-        <div class="summary-item"><span>넘버</span><b class="summary-value green">0명</b></div>
+        <div class="summary-item"><span>전체접속</span><b class="summary-value green">2명</b></div>
+        <div class="summary-item"><span>넘버</span><b class="summary-value green">1명</b></div>
         <div class="summary-item"><span>마음</span><b class="summary-value green">1명</b></div>
         <div class="summary-item"><span>슈퍼</span><b class="summary-value green">0명</b></div>
     </div>
@@ -608,16 +608,44 @@ body {
         </div>
 
         <div id="riders" class="riders">
-        <div class="rider-card online"
-            data-team="마음"
+        <div class="rider-card online warning"
+            data-team="넘버"
             data-online="0"
-            data-name="김대환"
-            data-complete="36"
-            data-rate="100.0">
+            data-name="이윤재"
+            data-complete="35"
+            data-rate="79.5">
 
             <div class="rider-top">
                 <div class="rider-name">
-                    김대환
+                    이윤재
+                    <span class='mini-warning'>⚠</span>
+                </div>
+                <div class="badge online-badge">접속중</div>
+            </div>
+
+            <div class="rider-sub">넘버 | 접속중</div>
+
+            <div class="rider-stats">
+                <div><span>완료</span><b class="blue">35</b></div>
+                <div><span>거절</span><b class="red">8</b></div>
+                <div><span>수락</span><b class="yellow">79.5%</b></div>
+                <div><span>오전</span><b>4</b></div>
+                <div><span>오후</span><b>2</b></div>
+                <div><span>저녁</span><b>13</b></div>
+                <div><span>심야</span><b>16</b></div>
+            </div>
+        </div>
+        
+        <div class="rider-card online"
+            data-team="마음"
+            data-online="0"
+            data-name="김석원"
+            data-complete="18"
+            data-rate="90.0">
+
+            <div class="rider-top">
+                <div class="rider-name">
+                    김석원
                     
                 </div>
                 <div class="badge online-badge">접속중</div>
@@ -626,13 +654,13 @@ body {
             <div class="rider-sub">마음 | 접속중</div>
 
             <div class="rider-stats">
-                <div><span>완료</span><b class="blue">36</b></div>
-                <div><span>거절</span><b class="red">0</b></div>
-                <div><span>수락</span><b class="yellow">100.0%</b></div>
-                <div><span>오전</span><b>0</b></div>
-                <div><span>오후</span><b>0</b></div>
-                <div><span>저녁</span><b>3</b></div>
-                <div><span>심야</span><b>33</b></div>
+                <div><span>완료</span><b class="blue">18</b></div>
+                <div><span>거절</span><b class="red">2</b></div>
+                <div><span>수락</span><b class="yellow">90.0%</b></div>
+                <div><span>오전</span><b>9</b></div>
+                <div><span>오후</span><b>9</b></div>
+                <div><span>저녁</span><b>0</b></div>
+                <div><span>심야</span><b>0</b></div>
             </div>
         </div>
         
@@ -829,34 +857,6 @@ body {
                 <div><span>오후</span><b>3</b></div>
                 <div><span>저녁</span><b>15</b></div>
                 <div><span>심야</span><b>21</b></div>
-            </div>
-        </div>
-        
-        <div class="rider-card offline warning"
-            data-team="넘버"
-            data-online="1"
-            data-name="이윤재"
-            data-complete="35"
-            data-rate="79.5">
-
-            <div class="rider-top">
-                <div class="rider-name">
-                    이윤재
-                    <span class='mini-warning'>⚠</span>
-                </div>
-                <div class="badge offline-badge">오프라인</div>
-            </div>
-
-            <div class="rider-sub">넘버 | 오프라인</div>
-
-            <div class="rider-stats">
-                <div><span>완료</span><b class="blue">35</b></div>
-                <div><span>거절</span><b class="red">8</b></div>
-                <div><span>수락</span><b class="yellow">79.5%</b></div>
-                <div><span>오전</span><b>4</b></div>
-                <div><span>오후</span><b>2</b></div>
-                <div><span>저녁</span><b>13</b></div>
-                <div><span>심야</span><b>16</b></div>
             </div>
         </div>
         
@@ -2204,6 +2204,34 @@ body {
             </div>
         </div>
         
+        <div class="rider-card offline"
+            data-team="마음"
+            data-online="1"
+            data-name="김대환"
+            data-complete="36"
+            data-rate="100.0">
+
+            <div class="rider-top">
+                <div class="rider-name">
+                    김대환
+                    
+                </div>
+                <div class="badge offline-badge">오프라인</div>
+            </div>
+
+            <div class="rider-sub">마음 | 오프라인</div>
+
+            <div class="rider-stats">
+                <div><span>완료</span><b class="blue">36</b></div>
+                <div><span>거절</span><b class="red">0</b></div>
+                <div><span>수락</span><b class="yellow">100.0%</b></div>
+                <div><span>오전</span><b>0</b></div>
+                <div><span>오후</span><b>0</b></div>
+                <div><span>저녁</span><b>3</b></div>
+                <div><span>심야</span><b>33</b></div>
+            </div>
+        </div>
+        
         <div class="rider-card offline warning"
             data-team="마음"
             data-online="1"
@@ -2789,34 +2817,6 @@ body {
                 <div><span>오후</span><b>0</b></div>
                 <div><span>저녁</span><b>7</b></div>
                 <div><span>심야</span><b>13</b></div>
-            </div>
-        </div>
-        
-        <div class="rider-card offline"
-            data-team="마음"
-            data-online="1"
-            data-name="김석원"
-            data-complete="18"
-            data-rate="90.0">
-
-            <div class="rider-top">
-                <div class="rider-name">
-                    김석원
-                    
-                </div>
-                <div class="badge offline-badge">오프라인</div>
-            </div>
-
-            <div class="rider-sub">마음 | 오프라인</div>
-
-            <div class="rider-stats">
-                <div><span>완료</span><b class="blue">18</b></div>
-                <div><span>거절</span><b class="red">2</b></div>
-                <div><span>수락</span><b class="yellow">90.0%</b></div>
-                <div><span>오전</span><b>9</b></div>
-                <div><span>오후</span><b>9</b></div>
-                <div><span>저녁</span><b>0</b></div>
-                <div><span>심야</span><b>0</b></div>
             </div>
         </div>
         
