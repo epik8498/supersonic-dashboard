@@ -1,16 +1,17 @@
 import subprocess
 from datetime import datetime
 
-def run(cmd):
-    subprocess.run(cmd, shell=True, check=False)
+msg = datetime.now().strftime("auto update %Y-%m-%d %H:%M:%S")
 
-now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+commands = [
+    "git add .",
+    f'git commit -m "{msg}"',
+    "git pull --rebase origin main",
+    "git push origin main"
+]
 
-run("git add index.html")
-run("git add 달서A_dashboard.html")
-run("git add 달서B_dashboard.html")
-run("git add 중구A_dashboard.html")
-run(f'git commit -m "auto update {now}"')
-run("git push origin main")
+for cmd in commands:
+    print(f"\n실행: {cmd}")
+    result = subprocess.run(cmd, shell=True)
 
-print("GitHub 자동 업로드 완료")
+print("\nGitHub 자동 업로드 완료")
